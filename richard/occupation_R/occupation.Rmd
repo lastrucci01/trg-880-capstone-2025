@@ -1,0 +1,389 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+# Preprocessing
+
+```{r}
+load_data <- function(filepath = "../data/data.csv") {
+  df <- read.csv(filepath)
+  return(df)
+}
+```
+
+```{r}
+standardize_nas <- function(df) {
+  # Convert empty strings and "NA" strings to actual NA
+  df$OCCUPATION_CODE[df$OCCUPATION_CODE == "" | df$OCCUPATION_CODE == "NA"] <- NA
+  df$OCCUPATION_DESC1[df$OCCUPATION_DESC1 == "" | df$OCCUPATION_DESC1 == "NA"] <- NA
+  
+  return(df)
+}
+
+```
+
+```{r}
+check_occupation_nas <- function(df) {
+  na_counts <- data.frame(
+    OCCUPATION_CODE = sum(is.na(df$OCCUPATION_CODE)),
+    OCCUPATION_DESC1 = sum(is.na(df$OCCUPATION_DESC1))
+  )
+  
+  print(na_counts)
+}
+```
+
+```{r}
+clean_text <- function(df) {
+  df$OCCUPATION_DESC1_temp <- tolower(df$OCCUPATION_DESC1)
+  df$OCCUPATION_DESC1_temp <- gsub("[^\\w\\s]", " ", df$OCCUPATION_DESC1_temp, perl = TRUE)
+  return(df)
+}
+```
+
+```{r}
+library(dplyr)
+
+fill_missing_codes <- function(df) {
+  # Get most frequent codes per description
+  most_freq_codes <- df %>%
+    filter(!is.na(OCCUPATION_CODE)) %>%
+    group_by(OCCUPATION_DESC1_temp, OCCUPATION_CODE) %>%
+    summarise(freq = n(), .groups = "drop") %>%
+    arrange(OCCUPATION_DESC1_temp, desc(freq)) %>%
+    group_by(OCCUPATION_DESC1_temp) %>%
+    slice_head(n = 1) %>%
+    select(OCCUPATION_DESC1_temp, OCCUPATION_CODE_mostfreq = OCCUPATION_CODE)
+  
+  # Merge and fill missing codes
+  df_filled <- df %>%
+    left_join(most_freq_codes, by = "OCCUPATION_DESC1_temp") %>%
+    mutate(OCCUPATION_CODE = ifelse(is.na(OCCUPATION_CODE), OCCUPATION_CODE_mostfreq, OCCUPATION_CODE)) %>%
+    select(-OCCUPATION_CODE_mostfreq)
+  
+  return(df_filled)
+}
+```
+
+```{r}
+fill_missing_descriptions <- function(df) {
+  # Get most frequent descriptions per code
+  most_freq_desc <- df %>%
+    filter(!is.na(OCCUPATION_DESC1_temp)) %>%
+    group_by(OCCUPATION_CODE, OCCUPATION_DESC1_temp) %>%
+    summarise(freq = n(), .groups = "drop") %>%
+    arrange(OCCUPATION_CODE, desc(freq)) %>%
+    group_by(OCCUPATION_CODE) %>%
+    slice_head(n = 1) %>%
+    select(OCCUPATION_CODE, OCCUPATION_DESC1_temp_mostfreq = OCCUPATION_DESC1_temp)
+
+  # Merge and fill missing descriptions
+  df_filled <- df %>%
+    left_join(most_freq_desc, by = "OCCUPATION_CODE") %>%
+    mutate(
+      OCCUPATION_DESC1_temp = ifelse(is.na(OCCUPATION_DESC1_temp), OCCUPATION_DESC1_temp_mostfreq, OCCUPATION_DESC1_temp),
+      OCCUPATION_DESC1 = ifelse(is.na(OCCUPATION_DESC1), OCCUPATION_DESC1_temp_mostfreq, OCCUPATION_DESC1)  # Also fill original column
+    ) %>%
+    select(-OCCUPATION_DESC1_temp_mostfreq)
+
+  return(df_filled)
+}
+```
+
+```{r}
+df = load_data("../../data/data.csv")
+```
+
+```{r}
+df = standardize_nas(df)
+check_occupation_nas(df)
+df = clean_text(df)
+df = fill_missing_codes(df)
+check_occupation_nas(df)
+df = fill_missing_descriptions(df)
+check_occupation_nas(df)
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+library(hunspell)
+
+spell_check_occupations <- function(df) {
+  fix_text <- function(text) {
+    if (is.na(text)) return(text)
+    
+    # Remove anything after '/' or ':'
+    text <- strsplit(text, "[/:]")[[1]][1]
+    text <- trimws(text)
+    
+    words <- strsplit(text, "\\s+")[[1]]
+    corrected_words <- c()
+    
+    for (w in words) {
+      suggestions <- hunspell_suggest(w)[[1]]
+      if (length(suggestions) > 0) {
+        corrected <- suggestions[1]  # Take first suggestion
+      } else {
+        corrected <- w  # Keep original if no suggestions
+      }
+      corrected_words <- c(corrected_words, corrected)
+    }
+    
+    return(tolower(paste(corrected_words, collapse = " ")))
+  }
+  
+  # Get unique occupations and clean them
+  unique_occupations <- unique(df$OCCUPATION_DESC1_temp[!is.na(df$OCCUPATION_DESC1_temp)])
+  unique_cleaned <- sapply(unique_occupations, fix_text, USE.NAMES = FALSE)
+  
+  # Create mapping
+  cleaning_map <- setNames(unique_cleaned, unique_occupations)
+  
+  # Apply mapping
+  df$OCCUPATION_DESC1_clean <- cleaning_map[df$OCCUPATION_DESC1_temp]
+  
+  return(df)
+}
+
+
+```
+
+```{r}
+apply_manual_corrections <- function(df) {
+  manual_map <- c(
+    "bottlestore" = "alcohol retailer",
+    "panelbeater" = "panel beater", 
+    "debswana" = "mining",
+    "nightwatch" = "night watchman",
+    "groundslady" = "grounds lady",
+    "ramotswa" = "unknown",
+    "procurementofficer" = "procurement officer",
+    "businessdevelopment" = "business development",
+    "draughtsman" = "draughtsman",
+    "hydrogeologist" = "hydro geologist",
+    "crewboss" = "crew boss",
+    "wellfair" = "welfare",
+    "assistastant" = "assistant",
+    "morupule" = "mining",
+    "groundlady" = "ground lady",
+    "machineman" = "machine man",
+    "heradboy" = "herald boy",
+    "letshego" = "finance",
+    "accountscontroller" = "accounts controller",
+    "pharmacotherapist" = "pharma cotherapist",
+    "pipefitter" = "pipe fitter",
+    "supretendan" = "superintendent",
+    "machendezer" = "merchandiser",
+    "laundrylady" = "laundry lady",
+    "skilled semi skilled" = "skilled worker",
+    "waist packer" = "waste packer"
+  )
+  
+  # Apply manual corrections
+  for (old_term in names(manual_map)) {
+    df$OCCUPATION_DESC1_clean[df$OCCUPATION_DESC1_clean == old_term] <- manual_map[old_term]
+  }
+  
+  return(df)
+}
+```
+
+```{r}
+remove_generic_words <- function(df) {
+  generic_words <- c(
+    "worker", "assistant", "officer", "staff", "personnel", "manager", "director",
+    "supervisor", "administrator", "registrar", "practitioner", "controller",
+    "operator", "keeper", "hand", "attendant", "clerk", "cashier", "secretary",
+    "receptionist", "messenger", "guard", "soldier", "watchman", "orderly",
+    "sister", "teacher", "educator", "minor", "unknown"
+  )
+  
+  preprocess_occupation <- function(title) {
+    if (is.na(title)) return(title)
+    
+    words <- strsplit(tolower(trimws(title)), "\\s+")[[1]]
+    
+    # If single word, keep as is
+    if (length(words) == 1) {
+      return(tolower(trimws(title)))
+    }
+    
+    # Remove generic words
+    cleaned <- words[!words %in% generic_words]
+    
+    # If everything removed, fall back to original
+    if (length(cleaned) == 0) {
+      return(tolower(trimws(title)))
+    }
+    
+    return(paste(cleaned, collapse = " "))
+  }
+  
+  df$OCCUPATION_DESC1_clean <- sapply(df$OCCUPATION_DESC1_clean, preprocess_occupation, USE.NAMES = FALSE)
+  
+  return(df)
+}
+
+```
+
+```{r}
+df = spell_check_occupations(df)
+df = apply_manual_corrections(df)
+df = remove_generic_words(df)
+```
+
+```{r}
+check_unique_occupations <- function(df) {
+  unique_counts <- data.frame(
+    OCCUPATION_DESC1 = length(unique(df$OCCUPATION_DESC1[!is.na(df$OCCUPATION_DESC1)])),
+    OCCUPATION_DESC1_temp = if("OCCUPATION_DESC1_temp" %in% names(df)) length(unique(df$OCCUPATION_DESC1_temp[!is.na(df$OCCUPATION_DESC1_temp)])) else NA,
+    OCCUPATION_DESC1_clean = if("OCCUPATION_DESC1_clean" %in% names(df)) length(unique(df$OCCUPATION_DESC1_clean[!is.na(df$OCCUPATION_DESC1_clean)])) else NA
+  )
+  
+  print(unique_counts)
+}
+```
+
+```{r}
+check_unique_occupations(df)
+```
+
+```{r}
+analyze_occupation_lengths <- function(df) {
+  library(dplyr)
+  
+  # Get unique occupations and their lengths
+  unique_occs <- df %>%
+    filter(!is.na(OCCUPATION_DESC1_clean)) %>%
+    select(OCCUPATION_DESC1_clean) %>%
+    distinct() %>%
+    mutate(
+      char_length = nchar(OCCUPATION_DESC1_clean),
+      word_count = sapply(strsplit(OCCUPATION_DESC1_clean, "\\s+"), length)
+    )
+  
+  cat("=== OCCUPATION LENGTH ANALYSIS ===\n")
+  cat("Total unique occupations:", nrow(unique_occs), "\n\n")
+  
+  # Character length stats
+  cat("CHARACTER LENGTH STATISTICS:\n")
+  cat("Min:", min(unique_occs$char_length), "\n")
+  cat("Max:", max(unique_occs$char_length), "\n")
+  cat("Mean:", round(mean(unique_occs$char_length), 2), "\n")
+  cat("Median:", median(unique_occs$char_length), "\n\n")
+  
+  # Word count stats
+  cat("WORD COUNT STATISTICS:\n")
+  cat("Min:", min(unique_occs$word_count), "\n")
+  cat("Max:", max(unique_occs$word_count), "\n")
+  cat("Mean:", round(mean(unique_occs$word_count), 2), "\n")
+  cat("Median:", median(unique_occs$word_count), "\n\n")
+  
+  # Distribution tables
+  cat("CHARACTER LENGTH DISTRIBUTION:\n")
+  print(table(cut(unique_occs$char_length, breaks = c(0, 5, 10, 15, 20, 25, Inf))))
+  
+  cat("\nWORD COUNT DISTRIBUTION:\n")
+  print(table(unique_occs$word_count))
+  
+  # Show longest and shortest
+  cat("\nLONGEST OCCUPATIONS (by characters):\n")
+  print(head(unique_occs[order(-unique_occs$char_length), ], 5))
+  
+  cat("\nSHORTEST OCCUPATIONS (by characters):\n")
+  print(head(unique_occs[order(unique_occs$char_length), ], 5))
+  
+  return(unique_occs)
+}
+```
+
+```{r}
+analyze_occupation_lengths(df)
+```
+
+# Analysis
+
+```{r}
+uppercase_status <- function(df) {
+  df$STATUS <- toupper(df$STATUS)
+  return(df)
+}
+
+convert_can_to_lap <- function(df) {
+  df$STATUS[df$STATUS == "CAN"] <- "LAP"
+  return(df)
+}
+```
+
+```{r}
+df = uppercase_status(df)
+df = convert_can_to_lap(df)
+unique(df$STATUS)
+```
+
+```{r}
+pretty_print <- function(x, ncol = 10) {
+  len <- length(x)
+  pad <- ceiling(len / ncol) * ncol - len
+  mat <- matrix(c(x, rep(NA, pad)), ncol = ncol, byrow = TRUE)
+  print(mat)
+}
+```
+
+```{r}
+get_top_occupations <- function(df, top_n = 20) {
+  library(dplyr)
+  
+  top_occs <- df %>%
+    filter(!is.na(OCCUPATION_DESC1_clean)) %>%
+    group_by(OCCUPATION_DESC1_clean) %>%
+    summarise(count = n(), .groups = "drop") %>%
+    mutate(percentage = round(count / nrow(df) * 100, 2)) %>%
+    arrange(desc(count)) %>%
+    head(top_n)
+  
+  cat("Top", top_n, "occupations cover", 
+      round(sum(top_occs$count) / nrow(df) * 100, 1), 
+      "% of dataset\n")
+  
+  return(top_occs)
+}
+
+plot_occupation_histogram <- function(top_occs) {
+  library(ggplot2)
+  
+  p <- ggplot(top_occs, aes(x = reorder(OCCUPATION_DESC1_clean, count), y = count)) +
+    geom_bar(stat = "identity", fill = "steelblue") +
+    geom_text(aes(label = paste0(count, " (", percentage, "%)")), 
+              hjust = -0.1, size = 3) +
+    coord_flip() +
+    labs(
+      title = paste("Top", nrow(top_occs), "Occupations"),
+      x = "Occupation",
+      y = "Count"
+    ) +
+    theme_minimal() +
+    theme(axis.text.y = element_text(size = 8))
+  
+  print(p)
+}
+```
+
+```{r}
+top_20 <- get_top_occupations(df, top_n = 50)
+top_20
+# plot_occupation_histogram(top_20)
+```
+
+```{r}
+df[df$OCCUPATION_DESC1_clean == "teaser" & !is.na(df$OCCUPATION_DESC1_clean), 
+   c("OCCUPATION_DESC1", "OCCUPATION_DESC1_clean")]
+```

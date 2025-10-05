@@ -1,0 +1,66 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+```{r}
+df=read.csv("../../data/data.csv")
+```
+
+```{r}
+```
+
+```{r}
+pretty_print <- function(x, ncol = 10) {
+  len <- length(x)
+  pad <- ceiling(len / ncol) * ncol - len
+  mat <- matrix(c(x, rep(NA, pad)), ncol = ncol, byrow = TRUE)
+  print(mat)
+}
+
+```
+
+```{r}
+pretty_print(head(df$TERM))
+```
+
+```{r}
+pretty_print(unique(df$TERM))
+```
+
+```{r}
+product_mapping <- data.frame(
+  PRODUCT_CODE = c(
+    "A1", "A2", "A3", "A4", "A5", "A6", "A7", "A8", "A9", "A10", 
+    "A11", "A12", "A13", "A14", "A15", "A16", "A17", "A18", "A19", 
+    "A20", "A21", "A22", "A23", "A24", "A25", "A26", "A27"
+  ),
+  PRODUCT_TYPE = c(
+    "Funeral", "Risk", "Risk", "Risk", "Risk", "Risk", "Funeral", "Funeral", 
+    "Funeral", "Invest", "Funeral", "Health", "Invest", NA, "Invest", "Risk", 
+    NA, "Risk", "Risk", "Risk", NA, NA, "Risk", NA, NA, "Invest", NA
+  ),
+  stringsAsFactors = FALSE
+)
+
+product_mapping
+```
+
+```{r}
+# Example: join df with product_code to bring in PRODUCT_TYPE
+library(dplyr)
+
+df <- df %>%
+  left_join(product_mapping, by = "PRODUCT_CODE")
+
+```
+
+```{r}
+freq = as.data.frame(table("TERM" = df$TERM, "PRODUCT_TYPE"=df$PRODUCT_TYPE, "PRODUCT_CODE"=df$PRODUCT_CODE))
+freq_nonzero = freq[freq$Freq > 0,]
+freq_nonzero
+```
+
+```{r}
+base::table(df$TERM, df$PRODUCT_TYPE)
+```

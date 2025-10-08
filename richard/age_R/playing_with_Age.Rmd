@@ -217,7 +217,7 @@ bin_income_by_categories <- function(df, income_brackets=c(-Inf, 1000, 2500, 400
 df <- bin_income_by_categories(df)
 ```
 
-# Handle Premium 
+# Handle Premium
 
 ```{r}
 df$PREMIUM <- abs(df$PREMIUM)

@@ -1,0 +1,371 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+```{r}
+library(readxl)
+
+get_data_script_path <- function() {
+  script_dir <- dirname(rstudioapi::getSourceEditorContext()$path)
+  file.path(script_dir, "..", "..", "data", "SUMMARY12025.xlsx")
+}
+
+load_data <- function() {
+    filepath <- get_data_script_path()
+    df <- read_excel(filepath)
+    return(df)
+}
+
+df <- load_data()
+```
+
+```{r}
+library(dplyr)
+library(lubridate)
+
+map_product_code <- function(df, product_mapping) {
+  product_mapping <- data.frame(
+    PRODUCT_CODE = c(
+      "A1", "A2", "A3", "A4", "A5", "A6", "A7", "A8", "A9", "A10", 
+      "A11", "A12", "A13", "A14", "A15", "A16", "A17", "A18", "A19", 
+      "A20", "A21", "A22", "A23", "A24", "A25", "A26", "A27"
+    ),
+    PRODUCT_TYPE = c(
+      "Funeral", "Risk", "Risk", "Risk", "Risk", "Risk", "Funeral", "Funeral", 
+      "Funeral", "Invest", "Funeral", "Health", "Invest", NA, "Invest", "Risk", 
+      NA, "Risk", "Risk", "Risk", NA, NA, "Risk", NA, NA, "Invest", NA
+    ),
+    stringsAsFactors = FALSE
+  )
+  
+  df <- df %>%
+    left_join(product_mapping, by = "PRODUCT_CODE")
+  df <- df %>% filter(!is.na(PRODUCT_TYPE))
+  return (df)
+}
+
+# Calculate payer age at policy commencement date
+calculate_payer_age_at_commencement <- function(df) {
+  df %>%
+    mutate(
+      start_date = as.Date(PAYER_DATE_OF_BIRTH),
+      end_date = as.Date(COMMENCEMENT_DATE),
+      # Calculate age in years using interval division
+      PAYER_AGE_AT_COMMENCEMENT = interval(start_date, end_date) %/% years(1)
+    )
+}
+
+# Replace negative ages with product type mean
+handle_negative_ages <- function(df) {
+  df %>%
+    group_by(PRODUCT_TYPE) %>%
+    mutate(PAYER_AGE_AT_COMMENCEMENT = ifelse(
+      PAYER_AGE_AT_COMMENCEMENT < 0,
+      # Replace with mean age for same product type
+      mean(PAYER_AGE_AT_COMMENCEMENT[PAYER_AGE_AT_COMMENCEMENT >= 0], na.rm = TRUE),
+      PAYER_AGE_AT_COMMENCEMENT
+    )) %>%
+    ungroup()
+}
+
+# Create age group categories from continuous age values
+bin_ages_by_categories <- function(df, age_brackets=c(-Inf, 17, 25, 35, 45, 55, 65, Inf), age_labels=c("<18", "18-25", "26-35", "36-45", "46-55", "56-65", "66+")) {
+  # Cut ages into categorical groups
+  df$PAYER_AGE_GROUP <- cut(
+    df$PAYER_AGE_AT_COMMENCEMENT,
+    breaks = age_brackets,
+    labels = age_labels,
+    right = TRUE
+  )
+  return(df)
+}
+```
+
+```{r}
+df <- map_product_code(df)
+df <- calculate_payer_age_at_commencement(df)
+df <- handle_negative_ages(df)
+df <- bin_ages_by_categories(df)
+```
+
+# Imputing Gender by Title
+
+```{r}
+sum(is.na(df$TITLE))
+```
+
+```{r}
+table(df$TITLE)
+
+df <- df %>% mutate(TITLE = recode(TITLE, "MS" = "MISS", "MR." = "MR"))
+
+table(df$TITLE)
+```
+
+```{r}
+sum(is.na(df$GENDER))
+df %>% filter(GENDER == "MFMFMF") %>% nrow()
+df %>% filter(GENDER == "") %>% nrow()
+df %>% filter(is.na(GENDER)) %>% nrow()
+```
+
+```{r}
+df %>% filter(GENDER == "MFMFMF") %>% count(TITLE, GENDER)
+```
+
+```{r}
+gender_map <- c("MISS" = "FEMALE", "MR" = "MALE", "MRS" = "FEMALE")
+
+df$GENDER <- ifelse(df$GENDER %in% c("MALE", "FEMALE"), df$GENDER, gender_map[df$TITLE])
+
+table(df$GENDER)
+df %>% filter(GENDER == "MFMFMF") %>% nrow()
+sum(is.na(df$GENDER))
+```
+
+# Handle Income
+
+```{r}
+df$INCOME <- as.numeric(df$INCOME)
+
+summary(df$INCOME)
+df %>% filter(is.na(INCOME)) %>% nrow()
+```
+
+```{r}
+head(df$GENDER)
+head(df$PRODUCT_TYPE)
+head(df$PAYER_AGE_GROUP)
+```
+
+```{r}
+df %>% filter(is.na(PRODUCT_TYPE)) %>% nrow()
+```
+
+```{r}
+handle_income_missing <- function(df, grouping = c("GENDER", "PRODUCT_TYPE", "PAYER_AGE_GROUP")) {
+  library(dplyr)
+
+  # Create grouping key by concatenating variables
+  df$group_key <- do.call(paste, c(df[grouping], sep = "#"))
+
+  # Calculate median income by group and impute missing values
+  new_df <- df %>%
+    group_by(group_key) %>%
+    mutate(INCOME = ifelse(is.na(INCOME), median(INCOME, na.rm = TRUE), INCOME)) %>%
+    ungroup() %>%
+    select(-group_key)
+
+  return(new_df)
+}
+```
+
+```{r}
+df <- handle_income_missing(df)
+summary(df$INCOME)
+df %>% filter(is.na(INCOME)) %>% nrow()
+```
+
+```{r}
+handle_income_outliers <- function(df) {
+  # Calculate IQR boundaries
+  Q1 <- quantile(df$INCOME, 0.25, na.rm = TRUE)
+  Q3 <- quantile(df$INCOME, 0.75, na.rm = TRUE)
+  IQR <- Q3 - Q1
+
+  # Define extreme outlier boundaries (3 * IQR)
+  lower_bound <- Q1 - 3 * IQR
+  upper_bound <- Q3 + 3 * IQR
+
+  # Calculate median for replacement
+  median_income <- median(df$INCOME, na.rm = TRUE)
+
+  # Replace extreme outliers with median
+  new_df <- df
+  new_df$INCOME <- ifelse(df$INCOME < lower_bound | df$INCOME > upper_bound,
+                         median_income,
+                         df$INCOME)
+
+  return(new_df)
+}
+```
+
+```{r}
+df <- handle_income_outliers(df)
+summary(df$INCOME)
+```
+
+```{r}
+hist(df$INCOME)
+```
+
+```{r}
+bin_income_by_categories <- function(df, income_brackets=c(-Inf, 1000, 2500, 4000, 6000, 10000, Inf), income_labels=c("<1K", "1K-2.5K", "2.5K-4K", "4K-6K", "6K-10K", "10K+")) {
+  # Cut income into categorical groups
+  df$INCOME_GROUP <- cut(
+    df$INCOME,
+    breaks = income_brackets,
+    labels = income_labels,
+    right = TRUE
+  )
+  return(df)
+}
+```
+
+```{r}
+df <- bin_income_by_categories(df)
+```
+
+# Handle Premium 
+
+```{r}
+df$PREMIUM <- abs(df$PREMIUM)
+df %>% filter(is.na(PREMIUM)) %>% nrow()
+```
+
+```{r}
+# Count outliers using IQR method
+Q1 <- quantile(df$PREMIUM, 0.25, na.rm = TRUE)
+Q3 <- quantile(df$PREMIUM, 0.75, na.rm = TRUE)
+IQR <- Q3 - Q1
+
+# Count mild outliers (1.5 * IQR)
+df %>% filter(PREMIUM < (Q1 - 1.5 * IQR) | PREMIUM > (Q3 + 1.5 * IQR)) %>% count(PAYER_AGE_GROUP, PRODUCT_TYPE, GENDER)
+
+# Count extreme outliers (3 * IQR)
+df %>% filter(PREMIUM < (Q1 - 3 * IQR) | PREMIUM > (Q3 + 3 * IQR)) %>% count(PAYER_AGE_GROUP, PRODUCT_TYPE, GENDER)
+```
+
+```{r}
+library(dplyr)
+
+# Count observations with premium data grouped by AGE_GROUP and PRODUCT_TYPE
+df %>%
+  filter(is.na(PREMIUM)) %>%
+  count(PAYER_AGE_GROUP, PRODUCT_TYPE, GENDER)
+
+# Or count all observations (including missing premium)
+df %>% count(PAYER_AGE_GROUP, PRODUCT_TYPE)
+```
+
+```{r}
+handle_premium_outliers <- function(df, grouping = c("PAYER_AGE_GROUP", "PRODUCT_TYPE", "GENDER")) {
+  library(dplyr)
+
+  new_df <- df %>%
+    group_by(across(all_of(grouping))) %>%
+    mutate(
+      Q1 = quantile(PREMIUM, 0.25, na.rm = TRUE),
+      Q3 = quantile(PREMIUM, 0.75, na.rm = TRUE),
+      IQR = Q3 - Q1,
+      lower_bound = Q1 - 3 * IQR,
+      upper_bound = Q3 + 3 * IQR,
+      group_median = median(PREMIUM, na.rm = TRUE),
+      PREMIUM = ifelse(PREMIUM < lower_bound | PREMIUM > upper_bound,
+                      group_median, PREMIUM)
+    ) %>%
+    ungroup() %>%
+    select(-Q1, -Q3, -IQR, -lower_bound, -upper_bound, -group_median)
+
+  return(new_df)
+}
+
+# Z-score method (replace values > 3 standard deviations)
+handle_premium_outliers_z <- function(df, grouping = c("PAYER_AGE_GROUP", "PRODUCT_TYPE", "GENDER")) {
+  library(dplyr)
+
+  new_df <- df %>%
+    group_by(across(all_of(grouping))) %>%
+    mutate(
+      group_mean = mean(PREMIUM, na.rm = TRUE),
+      group_sd = sd(PREMIUM, na.rm = TRUE),
+      z_score = abs((PREMIUM - group_mean) / group_sd),
+      group_median = median(PREMIUM, na.rm = TRUE),
+      PREMIUM = ifelse(z_score > 3, group_median, PREMIUM)
+    ) %>%
+    ungroup() %>%
+    select(-group_mean, -group_sd, -z_score, -group_median)
+
+  return(new_df)
+}
+
+# Or percentile method (replace values beyond 1st/99th percentile)
+handle_premium_outliers_p <- function(df, grouping = c("PAYER_AGE_GROUP", "PRODUCT_TYPE", "GENDER")) {
+  library(dplyr)
+
+  new_df <- df %>%
+    group_by(across(all_of(grouping))) %>%
+    mutate(
+      p01 = quantile(PREMIUM, 0.01, na.rm = TRUE),
+      p99 = quantile(PREMIUM, 0.99, na.rm = TRUE),
+      group_median = median(PREMIUM, na.rm = TRUE),
+      PREMIUM = ifelse(PREMIUM < p01 | PREMIUM > p99, group_median, PREMIUM)
+    ) %>%
+    ungroup() %>%
+    select(-p01, -p99, -group_median)
+
+  return(new_df)
+}
+```
+
+```{r}
+df <- handle_premium_outliers(df)
+```
+
+```{r}
+summary(df$PREMIUM)
+hist(df$PREMIUM)
+```
+
+```{r}
+library(ggplot2)
+library(gridExtra)
+
+# Premium vs Age Group
+p1 <- ggplot(df, aes(x = PAYER_AGE_GROUP, y = PREMIUM)) +
+  geom_boxplot() + theme(axis.text.x = element_text(angle = 45))
+
+# Premium vs Income Group
+p2 <- ggplot(df, aes(x = INCOME_GROUP, y = PREMIUM)) +
+  geom_boxplot() + theme(axis.text.x = element_text(angle = 45))
+
+# Premium vs Product Type
+p3 <- ggplot(df, aes(x = PRODUCT_TYPE, y = PREMIUM)) +
+  geom_boxplot() + theme(axis.text.x = element_text(angle = 45))
+
+# Income vs Age Group
+p4 <- ggplot(df, aes(x = PAYER_AGE_GROUP, y = INCOME)) +
+  geom_boxplot() + theme(axis.text.x = element_text(angle = 45))
+
+# Display all plots
+grid.arrange(p1, p2, p3, p4, ncol = 2)
+```
+
+```{r}
+# Violin plots (distribution shape)
+p1 <- ggplot(df, aes(x = PAYER_AGE_GROUP, y = PREMIUM)) + geom_violin()
+
+# Bar plots (mean values)
+p2 <- ggplot(df, aes(x = PAYER_AGE_GROUP, y = PREMIUM)) + stat_summary(fun = "mean", geom = "bar")
+
+# Density plots
+p3 <- ggplot(df, aes(x = PREMIUM, fill = PRODUCT_TYPE)) + geom_density(alpha = 0.5)
+
+# Scatter plots
+p4 <- ggplot(df, aes(x = INCOME_GROUP, y = PREMIUM, color = PRODUCT_TYPE)) + geom_point()
+
+# Histograms
+p5 <- ggplot(df, aes(x = PREMIUM)) + geom_histogram() + facet_wrap(~PRODUCT_TYPE)
+
+# Point plots with error bars
+p6 <- ggplot(df, aes(x = PAYER_AGE_GROUP, y = PREMIUM)) +
+  stat_summary(fun.data = "mean_se", geom = "pointrange")
+
+p1
+p2
+p3
+p4
+p5
+p6
+```

@@ -4,10 +4,8 @@ output: html_notebook
 ---
 
 ```{r}
-df=read.csv("../../data/data.csv")
-```
-
-```{r}
+library(readxl)
+df= read_excel("../../data/SUMMARY12025.xlsx")
 ```
 
 ```{r}
@@ -17,7 +15,6 @@ pretty_print <- function(x, ncol = 10) {
   mat <- matrix(c(x, rep(NA, pad)), ncol = ncol, byrow = TRUE)
   print(mat)
 }
-
 ```
 
 ```{r}
@@ -56,11 +53,203 @@ df <- df %>%
 ```
 
 ```{r}
-freq = as.data.frame(table("TERM" = df$TERM, "PRODUCT_TYPE"=df$PRODUCT_TYPE, "PRODUCT_CODE"=df$PRODUCT_CODE))
+freq = as.data.frame(table("TERM" = df$TERM, "PRODUCT_TYPE"=df$PRODUCT_TYPE)) 
+                           # "PRODUCT_CODE"=df$PRODUCT_CODE))
 freq_nonzero = freq[freq$Freq > 0,]
 freq_nonzero
 ```
 
 ```{r}
-base::table(df$TERM, df$PRODUCT_TYPE)
+head(df$PAYER_DATE_OF_BIRTH)
+```
+
+```{r}
+library(dplyr)
+library(lubridate)
+df <- df %>%
+  mutate(
+    start_date = as.Date(PAYER_DATE_OF_BIRTH),
+    end_date = as.Date(COMMENCEMENT_DATE),
+    PAYER_AGE_AT_COMMENCEMENT  = interval(start_date, end_date) %/% years(1)
+  )
+
+
+```
+
+```{r}
+hist(df$PAYER_AGE_AT_COMMENCEMENT)
+```
+
+```{r}
+# Define age brackets and labels
+age_brackets <- c(-Inf, 17, 25, 35, 45, 55, 65, Inf)
+age_labels <- c("<18", "18-25", "26-35", "36-45", "46-55", "56-65", "66+")
+
+# Create the new age group variable
+df$PAYER_AGE_GROUP <- cut(
+  df$PAYER_AGE_AT_COMMENCEMENT,
+  breaks = age_brackets,
+  labels = age_labels,
+  right = TRUE
+)
+
+# View result
+table(df$PAYER_AGE_GROUP)
+
+```
+
+\<18 – Minor / Not insurable
+
+18–25 – Young adult
+
+26–35 – Early adulthood
+
+36–45 – Mid adulthood
+
+46–55 – Late adulthood
+
+56–65 – Pre-retirement
+
+66+ – Senior
+
+```{r}
+freq_age = as.data.frame(table("TERM" = df$TERM, "PRODUCT_TYPE"=df$PRODUCT_TYPE, "PAYER_AGE_GROUP" = df$PAYER_AGE_GROUP))
+freq_nonzero_age = freq_age[freq_age$Freq > 0,]
+freq_nonzero_age
+```
+
+```{r}
+sum(df$TERM > 100, na.rm = TRUE)
+nrow(df)
+(sum(df$TERM > 100, na.rm = TRUE) / nrow(df)) * 100 
+```
+
+```{r}
+sum(df$PAYER_AGE_AT_COMMENCEMENT < 0, na.rm = TRUE)
+nrow(df)
+(sum(df$PAYER_AGE_AT_COMMENCEMENT < 0, na.rm = TRUE) / nrow(df)) * 100 
+```
+
+```{r}
+# Replace "CAN" with "LAP"
+df$STATUS <- toupper(df$STATUS)
+
+df$STATUS[df$STATUS == "CAN"] = "LAP"
+df <- df[!df$STATUS %in% c("NUL", "PUP", "NFS", "MAT", "TRM", "EXP"), ]
+
+# Check the result
+table(df$STATUS)
+
+```
+
+```{r}
+head(df[df$STATUS == "EXP", ])
+```
+
+```{r}
+# df$PREMIUM[df$STATUS == "SUR"]
+library(dplyr)
+
+df %>%
+  group_by(STATUS) %>%
+  summarise(
+    negative_premiums = sum(PREMIUM < 0, na.rm = TRUE),
+    positive_premiums = sum(PREMIUM >= 0, na.rm = TRUE)
+  ) %>%
+  arrange(desc(negative_premiums))
+```
+
+```{r}
+library(ggplot2)
+
+ggplot(df, aes(x = STATUS, y = nloans)) +
+  geom_violin(trim = FALSE, fill = "skyblue", color = "black") +
+  geom_boxplot(width = 0.1, fill = "white") +  # optional: add boxplot inside violin
+  theme_minimal() +
+  labs(title = "Violin Plot of Value by Category",
+       x = "STATUS",
+       y = "xx")
+```
+
+```{r}
+library(dplyr)
+library(lubridate)
+
+df <- df %>%
+  mutate(
+    start_date = as.Date(COMMENCEMENT_DATE),
+    end_date = as.Date(STATUS_DATE),
+    DAYS_SINCE_COMMENCEMENT  = time_length(interval(start_date, end_date), "days"),
+    MONTHS_SINCE_COMMENCEMENT = time_length(interval(start_date, end_date), "months"),
+    YEARS_SINCE_COMMENCEMENT  = time_length(interval(start_date, end_date), "years")
+  )
+
+```
+
+```{r}
+freq_time_age = as.data.frame(table("STATUS" = df$STATUS, "MONTHS_SINCE_COMMENCEMENT"=df$MONTHS_SINCE_COMMENCEMENT, "DAYS_SINCE_COMMENCEMENT" = df$DAYS_SINCE_COMMENCEMENT))
+freq_time_age = freq_time_age[freq_time_age$Freq > 0,]
+freq_time_age
+```
+
+```{r}
+freq_time_age_group = as.data.frame(table("STATUS" = df$STATUS, "MONTHS_SINCE_COMMENCEMENT"=df$MONTHS_SINCE_COMMENCEMENT, "DAYS_SINCE_COMMENCEMENT" = df$DAYS_SINCE_COMMENCEMENT, "PAYER_AGE_GROUP" = df$PAYER_AGE_GROUP))
+freq_time_age_group = freq_time_age_group[freq_time_age_group$Freq > 0,]
+freq_time_age_group
+```
+
+```{r}
+library(dplyr)
+
+df %>%
+  group_by(STATUS) %>%
+  summarise(
+    less_than_1_year = sum(YEARS_SINCE_COMMENCEMENT < 1, na.rm = TRUE),
+    greater_than_1_year = sum(YEARS_SINCE_COMMENCEMENT >= 1, na.rm = TRUE),
+    total = n()
+  ) %>%
+  arrange(desc(total))
+
+
+```
+
+```{r}
+library(dplyr)
+
+df <- df %>%
+  mutate(
+    LAPSE_WITHIN_A_YEAR = ifelse(STATUS == "LAP" & YEARS_SINCE_COMMENCEMENT < 1, 1, 0)
+  )
+
+```
+
+```{r}
+length(df$LAPSE_WITHIN_A_YEAR)
+length(df$IN)
+```
+
+```{r}
+df <- df[!df$GENDER %in% c("MFMFMF"), ]
+# Fit logistic regression
+model <- glm(LAPSE_WITHIN_A_YEAR ~ GENDER + YEARS_SINCE_COMMENCEMENT,
+             data = df,
+             family = binomial)
+
+# Calculate linear predictor (logit)
+df$linear_pred <- predict(model, type = "link")  # this is X*beta
+
+# Plot linear predictor vs continuous predictor (YEARS_SINCE_COMMENCEMENT)
+library(ggplot2)
+ggplot(df, aes(x = YEARS_SINCE_COMMENCEMENT, y = linear_pred)) +
+  geom_point(alpha = 0.5) +
+  geom_smooth(method = "loess") +
+  labs(title = "Linearity check: Linear predictor vs YEARS_SINCE_COMMENCEMENT",
+       x = "Years Since Commencement",
+       y = "Linear Predictor (logit)") +
+  theme_minimal()
+
+```
+
+```{r}
+unique(df$PAYMENT_MODE)
 ```

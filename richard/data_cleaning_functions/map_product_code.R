@@ -1,22 +1,18 @@
 library(dplyr)
 
-map_product_code <- function(df, product_mapping) {
-  product_mapping <- data.frame(
-    PRODUCT_CODE = c(
-      "A1", "A2", "A3", "A4", "A5", "A6", "A7", "A8", "A9", "A10", 
-      "A11", "A12", "A13", "A14", "A15", "A16", "A17", "A18", "A19", 
-      "A20", "A21", "A22", "A23", "A24", "A25", "A26", "A27"
-    ),
-    PRODUCT_TYPE = c(
-      "Funeral", "Risk", "Risk", "Risk", "Risk", "Risk", "Funeral", "Funeral", 
-      "Funeral", "Invest", "Funeral", "Health", "Invest", NA, "Invest", "Risk", 
-      NA, "Risk", "Risk", "Risk", NA, NA, "Risk", NA, NA, "Invest", NA
-    ),
-    stringsAsFactors = FALSE
-  )
-  
+map_product_code <- function(df) {
   df <- df %>%
-    left_join(product_mapping, by = "PRODUCT_CODE")
+    mutate(
+      PRODUCT_GROUP = factor(
+        case_when(
+          PRODUCT_CODE %in% c("A1", "A7", "A8", "A9", "A11") ~ "FUNERAL",
+          PRODUCT_CODE %in% c("A2","A3","A4","A5","A6","A16","A18","A19","A20","A23") ~ "RISK",
+          PRODUCT_CODE %in% c("A10","A13","A15","A26") ~ "INVEST",
+          PRODUCT_CODE == "A12" ~ "HEALTH",
+          TRUE ~ "UNKNOWN"
+        )
+      )
+    )
   
-  return (df)
+  return(df)
 }

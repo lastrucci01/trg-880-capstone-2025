@@ -1,0 +1,305 @@
+original,corrected,confidence,original_freq,corrected_freq,top_candidates,sample_phrases
+deeds,dress,0.534,1,38,dress(0.534),examiner title deeds
+glass,ass,0.516,1,32,ass(0.516); gas(0.432); loss(0.432),glass cutter
+camel,game,0.72,1,164,game(0.720); camp(0.720); care(0.501); panel(0.471); cage(0.462),camel trainer
+light,night,0.8599999999999999,2,284,night(0.860); lift(0.429),light duty driver
+systerms,system,0.9249999999999999,2,345,system(0.925); sisters(0.825); systems(0.784),senior systerms egineer
+egineer,engineer,1.0125,2,2763,engineer(1.012),senior systerms egineer
+tearing,leading,0.542,2,14,leading(0.542); clearing(0.537),tearing flowerist
+technicial,technician,1.03,2,5519,technician(1.030); technical(1.030); techinician(0.582); techician(0.572),technicial assistant
+weighter,fighter,0.576,2,17,fighter(0.576),back weighter
+weifare,welfare,0.8999999999999999,2,437,welfare(0.900); walfare(0.509),family weifare educator
+customerr,customer,0.922222222222222,1,416,customer(0.922),customerr services officer
+marchendiser,merchandiser,0.6073333333333334,1,8,merchandiser(0.607),marchendiser
+bulding,building,0.7084999999999999,1,32,building(0.708),bulding assistant
+user,burser,0.7666666666666666,2,211,burser(0.767); snr(0.650); buyer(0.438); super(0.429),systems user analyst computers
+computers,computer,1.0222222222222221,2,6147,computer(1.022),systems user analyst computers
+clyinder,cylinder,0.5399999999999999,1,5,cylinder(0.540),clyinder filler
+killer,skilled,0.8,1,64004,skilled(0.800); filler(0.622); driller(0.524); teller(0.524); griller(0.515),pest killer
+loans,land,0.714,2,98,land(0.714); lands(0.528); roads(0.474); loss(0.432),loans consultant
+offier,officer,0.9999999999999999,1,40768,officer(1.000); office(0.767); officr(0.592); offficer(0.537); ooficer(0.509),police offier
+gen,agent,0.72,1,217,agent(0.720); non(0.533); man(0.533); gang(0.365); rep(0.257),gen duties assistant
+offcier,officer,0.9,2,40768,officer(0.900); offficer(0.537); officr(0.509),prison offcier
+spanner,planner,0.683,2,61,planner(0.683); skinner(0.593),spanner man
+blast,blaster,0.8,1,118,blaster(0.800); plant(0.720),blast licence holder
+kitchan,kitchen,0.8999999999999999,2,3207,kitchen(0.900),kitchan hand
+ngo,non,0.5333333333333333,2,3906,non(0.533); co(0.533),coordinator ngo
+councilor,councillor,0.9299999999999999,2,577,councillor(0.930); council(0.556),councilor
+estates,estate,0.8999999999999999,2,133,estate(0.900); state(0.518),estates officer; assistant estates officer
+wid,wild,0.5429999999999999,2,6,wild(0.543); aid(0.476); aids(0.416); wife(0.383); maid(0.359),wid life officer
+hostel,postal,0.6616666666666666,1,65,postal(0.662); host(0.479),hostel matron
+analysis,analyst,0.9249999999999999,1,428,analyst(0.925),economic analysis
+seamstres,seamstress,0.669,1,13,seamstress(0.669),seamstres
+minder,miner,0.8833333333333333,2,505,miner(0.883); minor(0.767); sinker(0.767); mine(0.692); tender(0.512),plant minder
+guards,guard,0.8803333333333334,2,99,guard(0.880),security guards
+lhd,lady,0.6499999999999999,1,136,lady(0.650); land(0.644); law(0.533); lab(0.299); lay(0.263),lhd operator
+tour,court,0.72,1,352,court(0.720); town(0.461),senior travel tour consulant
+consulant,consultant,0.9299999999999999,1,4263,consultant(0.930); consutlant(0.639),senior travel tour consulant
+moulder,holder,0.8,2,134,holder(0.800),brick moulder
+accountan,accountant,0.9299999999999999,2,2875,accountant(0.930); accounts(0.844); account(0.598); accounting(0.569),assistant accountan
+boil,boiler,0.6586666666666667,1,64,boiler(0.659); boss(0.605); soil(0.546); book(0.392); bcl(0.371),boil operator
+slot,shop,0.6499999999999999,2,1656,shop(0.650); slots(0.605); scout(0.582); pilot(0.561); sos(0.362),slot host
+execise,excise,0.645,2,15,excise(0.645); exercise(0.621),assistant customs execise officer
+standars,standard,0.6275,2,5,standard(0.627),standars officer
+vererinary,veterinary,0.9299999999999999,2,295,veterinary(0.930); verinary(0.635); veterenary(0.572),vererinary innoculator
+anaylst,analyst,0.9,2,428,analyst(0.900),assistant systems anaylst
+rado,radio,0.702,2,14,radio(0.702); lady(0.650); roads(0.474); roto(0.368),rado officer
+interprecter,interpreter,0.9416666666666667,1,101,interpreter(0.942),assistant court interprecter
+ordertly,orderly,0.9124999999999999,2,699,orderly(0.912); ordery(0.546); oderly(0.540); ordely(0.534),hospital ordertly
+cont,court,0.72,1,352,court(0.720); cook(0.650); non(0.650); co(0.650); scout(0.582),assistant stock cont
+lending,leading,0.642,2,14,leading(0.642); fencing(0.509),lending officer
+offocer,officer,0.9999999999999999,1,40768,officer(1.000); office(0.800); offficer(0.537); ooficer(0.509); officr(0.509),security offocer
+sport,store,0.72,2,2002,store(0.720); scout(0.582); support(0.539); post(0.429),sport assistant
+asst,ass,0.6209999999999999,1,32,ass(0.621); assist(0.488); waist(0.438); pest(0.383); host(0.362),asst administration officer
+kitchenmaid,kitchenhand,0.6147272727272727,1,14,kitchenhand(0.615),kitchenmaid
+credt,credit,0.8833333333333333,2,615,credit(0.883); crew(0.666); craft(0.621),credt admin assistant
+enumberator,enumerator,0.7983636363636364,1,54,enumerator(0.798); enumarator(0.612),traffic enumberator
+executing,executive,0.8444444444444443,2,876,executive(0.844),social worker executing social services
+acoounts,accounts,0.9124999999999999,1,4071,accounts(0.912); account(0.579),acoounts assistant
+qaulity,quality,0.536,1,12,quality(0.536),qaulity auditor
+lundry,laundry,0.8999999999999999,2,326,laundry(0.900); bindry(0.476),lundry man
+farmily,family,0.8999999999999999,2,419,family(0.900),senior farmily wellfair officer
+end,hand,0.6499999999999999,1,3231,hand(0.650); head(0.650); land(0.644); snr(0.533); herd(0.371),end controller
+swiychboard,switchboard,0.9363636363636363,1,610,switchboard(0.936),swiychboard operator
+mageress,manageress,0.629,2,23,manageress(0.629),branch mageress
+child,chief,0.72,1,1709,chief(0.720); wild(0.438),child
+mechanics,mechanical,0.9599999999999999,2,181,mechanical(0.960); mechanic(0.922); machanics(0.640); machanic(0.598),technician auto mechanics
+cash,camp,0.6499999999999999,2,194,camp(0.650); ass(0.446); care(0.431); cage(0.392); gas(0.362),cash tender
+distributor,distribution,0.7093333333333334,2,42,distribution(0.709),water distributor
+rental,dental,0.8833333333333333,1,119,dental(0.883); mental(0.619),rental sales agent
+wardress,waitress,0.825,1,106,waitress(0.825),prison wardress
+cavo,co,0.6499999999999999,1,148,co(0.650); camp(0.650); care(0.431); cage(0.392); call(0.362),cavo driver
+filed,field,0.72,2,1785,field(0.720); fire(0.582); filler(0.506); aided(0.444); wild(0.438),air filed attendant
+errector,erector,0.9124999999999999,1,287,erector(0.912); director(0.825); eractor(0.540),fence errector
+contract,contractor,0.581,2,7,contractor(0.581),contract estimator
+cdc,co,0.5333333333333333,1,148,co(0.533); exc(0.248); bic(0.248),sanitation attendant cdc
+grader,reader,0.5986666666666667,2,44,reader(0.599); leader(0.512); loader(0.497); order(0.476),grader operator
+miller,miner,0.7666666666666666,1,505,miner(0.767); filler(0.622); driller(0.524); teller(0.524); griller(0.515),miller
+litter,fitter,0.8833333333333333,1,1214,fitter(0.883); letter(0.676); cutter(0.650); sister(0.560),litter picker
+statisticia,statistician,0.9416666666666667,1,105,statistician(0.942); statistical(0.669),assistant statisticia
+chiefs,chief,0.8833333333333333,1,1709,chief(0.883); chef(0.767),snr chiefs representative
+engeneer,engineer,1.0125,2,2763,engineer(1.012),civil engeneer; engeneer
+welding,leading,0.542,2,14,leading(0.542),welding instructor
+trainning,training,0.922222222222222,2,235,training(0.922),trainning manager
+ngiht,night,0.72,1,284,night(0.720),ngiht watchman
+communty,community,0.6582222222222222,1,12,community(0.658),communty centre warden
+shelf,self,0.8059999999999999,2,82,self(0.806); chef(0.720); help(0.432),shelf assistant
+officcer,officer,1.0125,2,40768,officer(1.012); office(0.825); offficer(0.537); ooficer(0.534); officr(0.534),police officcer
+potter,fitter,0.7666666666666666,2,1214,fitter(0.767); sorter(0.767); cutter(0.650); porter(0.592); letter(0.560),potter; key potter
+abattor,abattoir,0.9124999999999999,1,140,abattoir(0.912),abattor attendant
+loading,leading,0.642,1,14,leading(0.642); boarding(0.567),loading cattle officer
+kiosk,risk,0.51,1,30,risk(0.510),self employed kiosk
+geophysics,geophysicist,0.6553333333333333,2,24,geophysicist(0.655),geophysics
+compresor,compressor,0.645,1,5,compressor(0.645),compresor operator
+high,night,0.72,1,284,night(0.720),high court judge
+cable,care,0.501,1,27,care(0.501); cabin(0.495); cage(0.462); call(0.432); sale(0.429),cable belt operator
+asistant,assistant,1.0222222222222221,2,17965,assistant(1.022); assiatant(0.553); assitant(0.534),technical asistant
+assistatnt,assistant,1.03,1,17965,assistant(1.030); assistastant(0.598); assitant(0.569); assiatant(0.569),technical assistatnt
+ward,warden,0.7666666666666666,2,155,warden(0.767); guard(0.717); hand(0.650); land(0.644); ware(0.534),hospital ward attendant
+custom,customs,0.8999999999999999,1,204,customs(0.900); customer(0.825),custom officer
+businesswoman,businessman,0.8923076923076922,1,223,businessman(0.892),businesswoman
+registry,registrar,0.8444444444444443,2,147,registrar(0.844),registry supervisor
+ccr,co,0.5333333333333333,2,148,co(0.533); snr(0.533); care(0.431); air(0.284); bar(0.275),ccr operator
+genera,general,0.8999999999999999,2,4051,general(0.900),genera duty assistant
+accontant,accountant,0.9299999999999999,2,2875,accountant(0.930),accontant
+author,auto,0.5896666666666667,1,41,auto(0.590); tutor(0.482),author
+product,project,0.569,2,23,project(0.569); producer(0.537),product manager
+bylaw,law,0.72,2,117,law(0.720),senior bylaw enforcement assistant
+abbattoir,abattoir,0.922222222222222,2,140,abattoir(0.922); abbatoir(0.634),abbattoir assistant; abbattoir attendant
+machenics,machanics,0.6402222222222221,2,6,machanics(0.640); machenic(0.634); machanic(0.598),auto machenics
+boat,boss,0.605,2,85,boss(0.605); board(0.507); book(0.392); bar(0.392); meat(0.374),boat driver
+administrstive,administrative,0.68,1,10,administrative(0.680),administrstive officer
+draftsman,craftman,0.8444444444444443,1,830,craftman(0.844),assistant draftsman
+gaurd,guard,0.717,1,99,guard(0.717),security gaurd
+interpretor,interpreter,0.9363636363636363,1,101,interpreter(0.936),assistant court interpretor
+bailing,bailiff,0.8,1,219,bailiff(0.800); building(0.621),bailing machine
+seamtress,seamstress,0.669,2,13,seamstress(0.669),seamtress
+blusting,blasting,0.9124999999999999,1,136,blasting(0.912),blusting holder
+buildier,builder,0.9124999999999999,1,244,builder(0.912); building(0.621),buildier
+heads,head,0.8599999999999999,1,418,head(0.860); roads(0.474); heavy(0.468); herd(0.441),heads man
+technicia,technician,1.03,1,5519,technician(1.030); technical(0.944); techinician(0.582); techician(0.556),medical lab technicia
+gaming,gauging,0.53,2,10,gauging(0.530); gang(0.482),gaming relation officer
+draft,craft,0.7609999999999999,2,67,craft(0.761); graft(0.569),draft man; draft improver
+plate,plant,0.72,1,2450,plant(0.720); gate(0.720); state(0.438),senior plate layer
+odinator,ordinator,0.922222222222222,2,139,ordinator(0.922),safety co odinator
+printer,painter,0.8999999999999999,2,601,painter(0.900),printer binding
+binding,building,0.6209999999999999,2,32,building(0.621); mining(0.566),printer binding
+heardman,headman,0.9124999999999999,1,731,headman(0.912); herdman(0.912),heardman
+enumorator,enumerator,0.792,2,54,enumerator(0.792); enumarator(0.669),traffic enumorator
+motuary,mortuary,0.8975,2,95,mortuary(0.897),snr motuary attendant
+courier,croupier,0.567,2,14,croupier(0.567),courier
+capentry,carpentry,0.6372222222222221,1,5,carpentry(0.637); capenter(0.582),capentry instrusctor
+instrusctor,instructor,0.9363636363636363,1,124,instructor(0.936); instuctor(0.582),capentry instrusctor
+road,head,0.6499999999999999,1,418,head(0.650); roads(0.614); board(0.507); room(0.392); roto(0.368),road safety officer
+scale,sales,0.72,2,1986,sales(0.720); sale(0.569); care(0.501); cage(0.462); state(0.438),scale recorder; scale operator
+license,licence,0.8999999999999999,2,130,licence(0.900),blasting license holder
+simstress,seamstress,0.599,1,13,seamstress(0.599),simstress
+housi,house,0.734,1,58,house(0.734); housing(0.524); host(0.432),officer ncsa mlglh local govt lands housi
+techinical,technical,1.03,1,3983,technical(1.030); mechanical(0.960); techinician(0.582),techinical officer
+charter,charge,0.542,2,14,charge(0.542),charter coordinator
+enoculator,innoculator,0.8727272727272726,2,206,innoculator(0.873); inoculator(0.669),veterinary enoculator
+craftsman,craftman,0.922222222222222,1,830,craftman(0.922),craftsman
+count,court,0.8599999999999999,2,352,court(0.860); scout(0.582); account(0.554); pound(0.435),count assistant
+log,non,0.5333333333333333,1,3906,non(0.533); co(0.533); law(0.533); loco(0.392); lock(0.365),log guard
+supplys,supply,0.8999999999999999,1,460,supply(0.900); supplies(0.825),supplys officer
+superviser,supervisor,1.03,1,1040,supervisor(1.030),superviser
+controll,controller,0.8599999999999999,2,1166,controller(0.860); control(0.732),air traffic controll assistant
+representatives,representative,0.9533333333333334,1,1152,representative(0.953); represantative(0.625),sales representatives
+load,local,0.72,2,133,local(0.720); head(0.650); lady(0.650); law(0.650); land(0.644),load haul operator; load operator
+educational,education,0.8727272727272726,1,768,education(0.873),educational research work
+customary,customer,0.8444444444444443,2,416,customer(0.844),police officer customary court; customary court president
+assisant,assistant,1.0222222222222221,2,17965,assistant(1.022); assitant(0.621); assiatant(0.553); assist(0.546),plant assisant
+controler,controller,0.9299999999999999,2,1166,controller(0.930); control(0.664),stock controler
+nil,non,0.5333333333333333,2,3906,non(0.533); soil(0.371); wild(0.368); till(0.359); air(0.284),nil
+admintration,administration,0.8999999999999999,2,6623,administration(0.900); adminstration(0.664),snr admintration officer
+cadet,care,0.501,1,27,care(0.501); cage(0.462),officer cadet
+socila,social,0.7666666666666666,2,1060,social(0.767); soil(0.488),socila worker
+mantenance,maintenance,1.0363636363636364,1,233,maintenance(1.036); maintanance(0.624),sewage mantenance
+lender,welder,0.7666666666666666,1,710,welder(0.767); leader(0.628); tender(0.628); reader(0.599); letter(0.560),micro lender owner
+protection,production,0.6739999999999999,2,38,production(0.674),field assistant plant protection
+attandance,attandant,0.575,1,5,attandant(0.575),laundry attandance
+orderley,orderly,0.9124999999999999,1,699,orderly(0.912); ordery(0.546); oderly(0.540); ordely(0.534),hospital orderley
+passenger,messenger,0.8444444444444443,2,2056,messenger(0.844),sales passenger agent; passenger services supervisor
+pensions,pensioner,0.8444444444444443,1,1051,pensioner(0.844); pension(0.621),pensions officer
+welf,self,0.7709999999999999,1,82,self(0.771); wild(0.368); help(0.362); belt(0.362),assistant family welf educator
+materail,material,0.5609999999999999,2,12,material(0.561),senior materail roads dept
+casual,manual,0.5116666666666667,1,15,manual(0.512),casual labourer
+cost,court,0.72,1,352,court(0.720); cook(0.650); co(0.650); boss(0.605); scout(0.582),cost accountant
+mechenic,mechanic,0.9124999999999999,1,3264,mechanic(0.912); machenic(0.624); machanic(0.579),mechenic
+bell,self,0.596,2,82,self(0.596); belt(0.537); bcl(0.371); help(0.362); call(0.362),bell picker
+tester,master,0.7666666666666666,1,171,master(0.767); meter(0.572); letter(0.560); sister(0.560); teller(0.524),pressure tester
+radiographic,radiographer,0.8143333333333334,1,77,radiographer(0.814); radiography(0.592),radiographic technologist
+mechandizer,mechandiser,0.6543636363636364,1,6,mechandiser(0.654); merchandiser(0.607),mechandizer
+supevisor,supervisor,1.03,1,1040,supervisor(1.030),security supevisor
+swicth,switch,0.5326666666666666,2,22,switch(0.533),swicth board operator
+lines,life,0.72,2,2143,life(0.720); miner(0.720); mine(0.645); lands(0.528); live(0.489),lines man
+adviser,advisor,0.828,1,76,advisor(0.828),business adviser
+soidier,soldier,0.8999999999999999,2,11012,soldier(0.900),soidier
+assis,assist,0.6043333333333334,1,7,assist(0.604); ass(0.516),snr admin assis officer
+opearator,operator,1.0222222222222221,1,9636,operator(1.022); operater(0.553),switchboard opearator
+imigration,immigration,0.9363636363636363,1,188,immigration(0.936),senior imigration assistant officer
+surveys,surveyor,0.825,1,639,surveyor(0.825); survey(0.609); surver(0.509),surveys assistant bcl
+guides,guide,0.6433333333333333,1,20,guide(0.643),guides co ordinator
+sports,scouts,0.7666666666666666,1,140,scouts(0.767); slots(0.512); stores(0.503); parts(0.476),sports producer
+statist,station,0.572,1,24,station(0.572),assist statist officer
+inumerator,enumerator,0.792,2,54,enumerator(0.792); enumarator(0.599),traffic inumerator; inumerator
+florist,forest,0.551,2,17,forest(0.551),horticulture florist
+map,man,0.7666666666666666,1,1487,man(0.767); camp(0.650); law(0.533); meat(0.374); mart(0.362),physical planner map making
+making,mining,0.5326666666666666,1,22,mining(0.533),physical planner map making
+abaittor,abattoir,0.825,2,140,abattoir(0.825),abaittor attendant
+servoice,service,0.9124999999999999,1,631,service(0.912); services(0.597),customer servoice assistant
+leasing,leading,0.642,1,14,leading(0.642); clearing(0.537),leasing constructing egent
+constructing,construction,0.7493333333333333,1,22,construction(0.749),leasing constructing egent
+egent,agent,0.8599999999999999,1,217,agent(0.860),leasing constructing egent
+officerr,officer,1.0125,1,40768,officer(1.012); office(0.825); offficer(0.537); ooficer(0.534); officr(0.534),wildlife officerr
+resourses,resources,0.922222222222222,1,953,resources(0.922); resource(0.598),human resourses
+stacker,staker,0.618,1,6,staker(0.618); taker(0.542); packer(0.518),bag stacker
+sewer,meter,0.525,1,35,meter(0.525); power(0.504); sewege(0.479); super(0.429),sewer attendant
+storekepeer,storekeeper,0.8727272727272726,1,119,storekeeper(0.873),storekepeer
+feild,field,0.72,1,1785,field(0.720); wild(0.438),feild assitant
+busar,bursar,0.8833333333333333,2,102,bursar(0.883); burser(0.767); bar(0.462); bus(0.456); buyer(0.438),busar
+min,man,0.7666666666666666,2,1487,man(0.767); mine(0.750); admin(0.720); minor(0.720); miner(0.720),general hand min roads transport
+operetor,operator,1.0125,1,9636,operator(1.012); operater(0.534),switchboard operetor
+veternary,veterinary,0.9299999999999999,2,295,veterinary(0.930); veterenary(0.642),assistant veternary officer
+planter,plant,0.8,2,2450,plant(0.800); painter(0.800); blaster(0.800); planner(0.783),attendant planter
+consultants,consultant,0.9363636363636363,2,4263,consultant(0.936); consultancy(0.585),property consultants; sales consultants
+enuemarator,enumerator,0.7347272727272727,2,54,enumerator(0.735); enumarator(0.675),enuemarator roads department
+waiteress,waitress,0.922222222222222,2,106,waitress(0.922),waiteress
+trans,trains,0.6073333333333334,2,8,trains(0.607); track(0.528); crane(0.459); train(0.450),assistant trans planner
+machinest,machinist,0.922222222222222,1,545,machinist(0.922); machine(0.844),machinest
+collectors,collector,0.9299999999999999,1,697,collector(0.930),debtors collectors
+nightwatcman,nightwatchman,0.9461538461538461,2,526,nightwatchman(0.946),nightwatcman
+attendantt,attendant,0.9299999999999999,2,608,attendant(0.930); attendent(0.716); attandant(0.575); attedant(0.572); ateendant(0.569),library attendantt
+atisan,artisan,0.8999999999999999,1,1572,artisan(0.900); artisans(0.609); artisian(0.540),assistant atisan
+constraction,construction,0.8076666666666666,2,22,construction(0.808),crew boss constraction bcl; managing director building constraction
+arms,army,0.825,2,180,army(0.825); armed(0.720); ass(0.446); parts(0.429); aids(0.416),serjeant arms
+admn,admin,0.8599999999999999,1,148,admin(0.860); army(0.650); admini(0.479),senior admn assist
+admnistration,administration,0.95,1,6623,administration(0.950); adminstration(0.610),assistant admnistration officer
+wacthman,watchman,0.825,2,12792,watchman(0.825),night wacthman
+hoist,house,0.594,1,58,house(0.594); host(0.572); waist(0.438); post(0.429),hoist driver
+tanker,banker,0.8833333333333333,2,1699,banker(0.883); sinker(0.767); maker(0.719); taker(0.625); tender(0.512),tanker loader
+trafic,traffic,0.8999999999999999,1,150,traffic(0.900); train(0.497),trafic enumarator
+uknown,unknown,0.8999999999999999,1,1129,unknown(0.900),uknown
+veterennary,veterinary,0.8727272727272726,1,295,veterinary(0.873); veterenary(0.648),veterennary innoculator
+bussiness,business,0.922222222222222,2,292,business(0.922); buisness(0.556),bussiness man
+comminication,communications,0.8829999999999999,1,61,communications(0.883); communication(0.697),police officer comminication ass supretendan
+pastoral,pastor,0.825,1,333,pastor(0.825),pastor pastoral ministries
+erator,operator,0.9249999999999999,1,9636,operator(0.925); erector(0.800); eractor(0.615); editor(0.611); curator(0.524),fence erator
+attenddant,attendant,0.9299999999999999,1,608,attendant(0.930); attendent(0.716); attandant(0.575); attedant(0.572); ateendant(0.569),cssd attenddant
+first,fire,0.582,1,54,fire(0.582); forest(0.518),first aid officer
+forester,forest,0.576,1,17,forest(0.576); forestry(0.540),forester
+nghtwatchman,nightwatchman,0.9461538461538461,1,526,nightwatchman(0.946),nghtwatchman
+consellor,counsellor,0.9299999999999999,2,544,counsellor(0.930),lay consellor
+vetirinary,veterinary,0.9299999999999999,1,295,veterinary(0.930); verinary(0.635); veterenary(0.572),vetirinary innoculator
+internet,internal,0.825,2,103,internal(0.825),graduate trainee internet
+assistnt,assistant,1.0222222222222221,1,17965,assistant(1.022); assiatant(0.553); assist(0.546); assitant(0.534),technical assistnt
+exacutive,executive,0.922222222222222,1,876,executive(0.922); eecutive(0.610),chief exacutive buyer
+manger,manager,0.9999999999999999,1,13773,manager(1.000); banker(0.767); miner(0.767); master(0.767); maker(0.719),trainee manger
+polishing,publishing,0.6409999999999999,1,27,publishing(0.641),polishing cars
+cars,camp,0.6499999999999999,1,194,camp(0.650); care(0.606); ass(0.446); parts(0.429); cage(0.392),polishing cars
+atendant,attendant,0.922222222222222,1,608,attendant(0.922); attendent(0.700); ateendant(0.631); attandant(0.559); attedant(0.537),drill atendant
+policy,police,0.8833333333333333,1,9508,police(0.883),senior policy officer
+heardsman,headman,0.8444444444444443,1,731,headman(0.844); herdman(0.844),heardsman
+mid,mine,0.575,2,75,mine(0.575); maid(0.534); man(0.533); aid(0.476); aids(0.416),registered nurse mid wife
+stastical,statistical,0.6687272727272726,2,32,statistical(0.669),stastical assistant officer; stastical assistant
+hr,snr,0.5333333333333333,1,189,snr(0.533); herd(0.371); hair(0.371); co(0.300); air(0.284),hr manager
+entrepreneur,enterpreneur,0.7003333333333334,2,39,enterpreneur(0.700),entrepreneur
+managingg,managing,0.922222222222222,1,2266,managing(0.922),managingg director
+deli,semi,0.6499999999999999,2,32002,semi(0.650); self(0.596); dept(0.383); dev(0.371); help(0.362),deli controller
+materials,material,0.6582222222222222,1,12,material(0.658),materials assistant
+supervicer,supervisor,0.9599999999999999,2,1040,supervisor(0.960),supervicer
+flight,night,0.7666666666666666,1,284,night(0.767),flight co ordinator
+shanter,shunter,0.717,2,39,shunter(0.717),shanter
+registred,registered,0.9299999999999999,1,184,registered(0.930); registrar(0.844),registred nurse
+ktchen,kitchen,0.8999999999999999,1,3207,kitchen(0.900),ktchen hand
+optomotrist,optometrist,0.7233636363636363,1,29,optometrist(0.723),optomotrist
+suprintendent,superintendent,0.806,1,52,superintendent(0.806),production suprintendent
+attendat,attendant,0.922222222222222,1,608,attendant(0.922); attendent(0.700); attandant(0.559); ateendant(0.553); attedant(0.537),workshop attendat
+buildings,building,0.7182222222222221,1,32,building(0.718),buildings labourer
+boading,boarding,0.6545,2,14,boarding(0.654); leading(0.542),boading master
+spotter,sorter,0.8,1,178,sorter(0.800); porter(0.509),waste spotter
+collecter,collector,0.922222222222222,2,697,collector(0.922),refuse collecter; debit collecter
+superintendant,superintendent,0.806,1,52,superintendent(0.806),superintendant police
+nursary,bursar,0.8,1,102,bursar(0.800); nursery(0.621),nursary assistant
+word,work,0.5549999999999999,1,10,work(0.555); board(0.507); works(0.432); herd(0.371); wild(0.368),word processor
+processor,professor,0.922222222222222,1,2438,professor(0.922); process(0.595),word processor
+bee,bye,0.5806666666666667,1,38,bye(0.581); belt(0.362); bar(0.275); bus(0.269); rep(0.257),bee keeping officer
+seam,semi,0.6499999999999999,1,32002,semi(0.650); head(0.650); self(0.596); steam(0.581); team(0.549),seam stress sewing
+stress,dress,0.5806666666666667,1,38,dress(0.581); stores(0.503),seam stress sewing
+trade,track,0.528,1,36,track(0.528); travel(0.482); crane(0.459); train(0.450),trade man assistant
+arch,army,0.6499999999999999,1,180,army(0.650); watch(0.471); batch(0.429); area(0.398); tech(0.377),arch building bricklayer
+dark,bank,0.6499999999999999,2,927,bank(0.650); care(0.431); bar(0.392); work(0.380); back(0.374),dark room attendant
+assisntant,assistant,1.03,1,17965,assistant(1.030); assitant(0.569); assiatant(0.569),assisntant officer
+tracker,trackers,0.9124999999999999,1,140,trackers(0.912); teacher(0.800); track(0.608); taker(0.542); packer(0.518),game tracker wildlife dept
+taffic,traffic,0.8999999999999999,1,150,traffic(0.900),assistant air taffic controller
+herdsman,herdman,0.9124999999999999,1,306,herdman(0.912); headman(0.825),herdsman
+fficer,officer,0.9999999999999999,1,40768,officer(1.000); office(0.767); offficer(0.537); ooficer(0.509); fencer(0.500),police fficer
+suprvisor,supervisor,1.03,1,1040,supervisor(1.030),suprvisor underground mine
+sewrage,sewerage,0.7174999999999999,1,35,sewerage(0.717); sewage(0.699); sewarage(0.651); seweage(0.609); sewege(0.512),sewrage attendent
+chemical,clerical,0.825,1,13916,clerical(0.825),chemical plant operator
+emprover,improver,0.8045,1,64,improver(0.804),graft emprover
+statistics,statistical,0.6687272727272726,1,32,statistical(0.669),snr statistics officer
+verterinary,veterinary,0.9363636363636363,1,295,veterinary(0.936); veterenary(0.585),verterinary innoculator
+statistic,statistical,0.6687272727272726,1,32,statistical(0.669),statistic assitsnt
+assitsnt,assistant,0.9444444444444443,1,17965,assistant(0.944); assitant(0.621); assiatant(0.553); assist(0.546),statistic assitsnt
+depot,deputy,0.7666666666666666,1,224,deputy(0.767); dept(0.593); debt(0.432),depot manager
+boner,banker,0.7666666666666666,2,1699,banker(0.767); miner(0.720); owner(0.720); boiler(0.659); broker(0.596),boner
+officers,officer,1.0125,1,40768,officer(1.012); office(0.825); offficer(0.537); ooficer(0.534); officr(0.534),commercial affairs officers
+safaris,safari,0.627,1,9,safari(0.627),professional guide venus safaris
+vector,erector,0.8,1,287,erector(0.800); doctor(0.767),vector control
+numerator,enumerator,0.792,1,54,enumerator(0.792); enumarator(0.599),traffic numerator
+officier,officer,1.0125,1,40768,officer(1.012); office(0.825); official(0.825); offficer(0.537); ooficer(0.534),police officier
+sinor,minor,0.8599999999999999,1,11591,minor(0.860); senior(0.767); sinker(0.767); miner(0.720); snr(0.720),sinor assistance
+loorkman,workman,0.6029999999999999,2,26,workman(0.603),loorkman
+mutuary,mortuary,0.8099999999999998,1,95,mortuary(0.810),mutuary attendant
+attentant,attendant,0.922222222222222,1,608,attendant(0.922); attendent(0.700); attandant(0.559); attedant(0.556); ateendant(0.553),sanitation attentant
+schoolar,scholar,0.9124999999999999,1,3650,scholar(0.912); school(0.540),schoolar
+seed,semi,0.6499999999999999,1,32002,semi(0.650); head(0.650); self(0.596); herd(0.371),seed collector
+recorder,reporter,0.825,1,218,reporter(0.825); records(0.825); record(0.585),scale recorder
+brewer,broker,0.5956666666666667,1,43,broker(0.596),brewer
+haul,hand,0.6499999999999999,1,3231,hand(0.650); hair(0.371); call(0.362),load haul operator
+grain,train,0.59,1,10,train(0.590); trains(0.491); graft(0.429),grain driver
+catographer,cartographer,0.6836666666666666,1,14,cartographer(0.684),catographer
+aministration,administration,0.95,1,6623,administration(0.950); adminstration(0.610),aministration assistant
+ofiicer,officer,0.9999999999999999,1,40768,officer(1.000); office(0.800); offficer(0.537); ooficer(0.509); officr(0.509),prison ofiicer
+nihgtwatchman,nightwatchman,0.8923076923076922,1,526,nightwatchman(0.892),nihgtwatchman

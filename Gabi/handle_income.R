@@ -24,5 +24,6 @@ handle_income <- function(df, grouping = c("PAYER_GENDER", "PRODUCT_GROUP", "OCC
   return(df)
 }
 
-
+df <- handle_income(df)
+summary(df$INCOME)
 

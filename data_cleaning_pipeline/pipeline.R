@@ -7,12 +7,13 @@ source("index.R")
 # Finds the location of the Excel file based on this files location
 get_data_script_path <- function() {
   script_dir <- dirname(rstudioapi::getSourceEditorContext()$path)
-  file.path(script_dir, "..", "data", "processed_data_with_sectors.xlsx")
+  file.path(script_dir, "..", "data")
 }
 
 # Opens and reads the Excel file
 load_data <- function() {
     filepath <- get_data_script_path()
+    filepath <- file.path(filepath, "processed_data_with_sectors.xlsx")
     df <- read_excel(filepath)
     return(df)
 }
@@ -76,6 +77,8 @@ data_cleaning_pipeline <- function(df) {
 df <- load_data()
 df <- data_cleaning_pipeline(df)
 
-# Save cleaned data to CSV
-write.csv(df, "cleaned_data.csv", row.names = FALSE)
-print("Data saved to cleaned_data.csv")
+# Save cleaned data to CSV in same directory as source data
+FILE_NAME <- "cleaned_data.csv" # CHANGE THIS TO THE NAME OF THE FILE 
+output_path <- file.path(dirname(get_data_script_path()), FILE_NAME)
+write.csv(df, output_path, row.names = FALSE)
+print(paste("Data saved to", output_path))

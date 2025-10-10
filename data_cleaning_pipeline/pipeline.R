@@ -7,7 +7,7 @@ source("index.R")
 # Finds the location of the Excel file based on this files location
 get_data_script_path <- function() {
   script_dir <- dirname(rstudioapi::getSourceEditorContext()$path)
-  file.path(script_dir, "..", "data", "processed_data_with_sector")
+  file.path(script_dir, "..", "data", "processed_data_with_sectors.xlsx")
 }
 
 # Opens and reads the Excel file
@@ -18,6 +18,10 @@ load_data <- function() {
 }
 
 data_cleaning_pipeline <- function(df) {
+
+    print("Cleaning sector mapping")
+    df <- clean_sector_mapping(df)
+
     print("Standardizing text fields and renaming columns")
     df <- normalise_data(df)
 
@@ -46,14 +50,32 @@ data_cleaning_pipeline <- function(df) {
     df <- handle_marital_status(df)
 
     print("Cleaning payment mode values")
-    df <- handle_payment_mode_unknown_pls(df)
+    df <- convert_payment_mode_to_factor(df)
     
-    print("Cleaning term, payfreq, premium, income, ps_lapse1")
-    df <- clean_missing_values(df)
+    # print("Cleaning term, payfreq, premium, income, ps_lapse1") missing ... 
+    # df <- clean_missing_values(df)
+
+    print("Handling income outliers")
+    df <- handle_income(df)
+
+    print("Filtering payment frequency")
+    df <- handle_payfreq(df)
+
+    print("Cleaning term values")
+    df <- handle_term(df)
+
+    print("Handling premium outliers")
+    df <- handle_premium(df)
+    
+    print("Handling policy lapse outliers")
+    df <- handle_ps_lapse1(df)
 
     return(df)
 }
 
 df <- load_data()
 df <- data_cleaning_pipeline(df)
-# print(head(df$PAYER_AGE_GROUP, 10))
+
+# Save cleaned data to CSV
+write.csv(df, "cleaned_data.csv", row.names = FALSE)
+print("Data saved to cleaned_data.csv")

@@ -7,7 +7,7 @@ source("index.R")
 # Finds the location of the Excel file based on this files location
 get_data_script_path <- function() {
   script_dir <- dirname(rstudioapi::getSourceEditorContext()$path)
-  file.path(script_dir, "..", "data", "SUMMARY12025.xlsx")
+  file.path(script_dir, "..", "data", "processed_data_with_sector")
 }
 
 # Opens and reads the Excel file
@@ -47,6 +47,9 @@ data_cleaning_pipeline <- function(df) {
 
     print("Cleaning payment mode values")
     df <- handle_payment_mode_unknown_pls(df)
+    
+    print("Cleaning term, payfreq, premium, income, ps_lapse1")
+    df <- clean_missing_values(df)
 
     return(df)
 }

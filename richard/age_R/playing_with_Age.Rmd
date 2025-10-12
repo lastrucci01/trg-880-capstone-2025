@@ -8,7 +8,7 @@ library(readxl)
 
 get_data_script_path <- function() {
   script_dir <- dirname(rstudioapi::getSourceEditorContext()$path)
-  file.path(script_dir, "..", "..", "data", "SUMMARY12025.xlsx")
+  file.path(script_dir, "..", "..", "data", "processed_data_with_sectors.xlsx")
 }
 
 load_data <- function() {
@@ -18,6 +18,10 @@ load_data <- function() {
 }
 
 df <- load_data()
+```
+
+```{r}
+df$ps_lapse1
 ```
 
 ```{r}

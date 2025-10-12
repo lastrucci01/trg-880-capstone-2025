@@ -13,15 +13,15 @@ get_data_script_path <- function() {
 # Opens and reads the Excel file
 load_data <- function() {
     filepath <- get_data_script_path()
-    filepath <- file.path(filepath, "processed_data_with_sectors.xlsx")
-    df <- read_excel(filepath)
+    filepath <- file.path(filepath, "data_with_sectors.csv")
+    df <- read.csv(filepath)
     return(df)
 }
 
 data_cleaning_pipeline <- function(df) {
 
-    print("Cleaning sector mapping")
-    df <- clean_sector_mapping(df)
+    print("Hanlde sector mapping")
+    df <- handle_sector_missing(df)
 
     print("Standardizing text fields and renaming columns")
     df <- normalise_data(df)

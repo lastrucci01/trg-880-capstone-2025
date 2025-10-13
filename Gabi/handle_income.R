@@ -1,10 +1,12 @@
-handle_income <- function(df, grouping = c("PAYER_GENDER", "PRODUCT_GROUP", "OCCUPATION_clean" , "PAYER_AGE_GROUP")) {
+handle_income <- function(df, grouping = c("PAYER_GENDER", "PRODUCT_GROUP", "OCCUPATION_clean", "PAYER_AGE_GROUP")) {
   df$INCOME <- as.numeric(df$INCOME)
+  
+  # Compute overall median as fallback
+  overall_median <- median(df$INCOME, na.rm = TRUE)
   
   # Create grouping key
   df$group_key <- do.call(paste, c(df[grouping], sep = "#"))
   
-  # Detect outliers and replace with group median
   df <- df %>%
     group_by(group_key) %>%
     mutate(
@@ -15,7 +17,8 @@ handle_income <- function(df, grouping = c("PAYER_GENDER", "PRODUCT_GROUP", "OCC
       upper_bound = Q3 + 1.5 * IQR_val,
       is_outlier = (INCOME < lower_bound) | (INCOME > upper_bound),
       group_median = median(INCOME[!is_outlier], na.rm = TRUE),
-      # Replace NA or outlier with group median
+      # Use overall median if group median is NA
+      group_median = ifelse(is.na(group_median), overall_median, group_median),
       INCOME = ifelse(is.na(INCOME) | is_outlier, group_median, INCOME)
     ) %>%
     ungroup() %>%
@@ -25,5 +28,5 @@ handle_income <- function(df, grouping = c("PAYER_GENDER", "PRODUCT_GROUP", "OCC
 }
 
 df <- handle_income(df)
-summary(df$INCOME)
+
 

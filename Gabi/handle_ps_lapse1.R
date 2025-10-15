@@ -1,21 +1,25 @@
-handle_ps_lapse1<- function(df, group_cols = c("PAYER_AGE_GROUP", "PRODUCT_GROUP", "PAYER_GENDER", "OCCUPATION_clean")) {
-  df <- df %>% mutate(ps_lapse1 = abs(ps_lapse1))
+handle_ps_lapse1 <- function(df, group_cols = c("PAYER_AGE_GROUP", "PRODUCT_GROUP", "PAYER_GENDER", "OCCUPATION_clean")) {
+  df <- df %>% mutate(PS_LAPSE1 = abs(PS_LAPSE1))
   
-  # Detect and replace outliers for ps_lapse1 using IQR within groups
+  # Detect and replace outliers for PS_LAPSE1 using IQR within groups
   df <- df %>%
     group_by(across(all_of(group_cols))) %>%
     mutate(
-      Q1 = quantile(ps_lapse1, 0.25, na.rm = TRUE),
-      Q3 = quantile(ps_lapse1, 0.75, na.rm = TRUE),
+      Q1 = quantile(PS_LAPSE1, 0.25, na.rm = TRUE),
+      Q3 = quantile(PS_LAPSE1, 0.75, na.rm = TRUE),
       IQR_val = Q3 - Q1,
       lower_bound = Q1 - 1.5 * IQR_val,
       upper_bound = Q3 + 1.5 * IQR_val,
-      is_outlier = ps_lapse1 < lower_bound | ps_lapse1 > upper_bound,
-      ps_lapse1 = ifelse(is_outlier, median(ps_lapse1[!is_outlier], na.rm = TRUE), ps_lapse1)
+      is_outlier = PS_LAPSE1 < lower_bound | PS_LAPSE1 > upper_bound,
+      PS_LAPSE1 = ifelse(is_outlier, median(PS_LAPSE1[!is_outlier], na.rm = TRUE), PS_LAPSE1),
+      # Cap at 100
+      PS_LAPSE1 = pmin(PS_LAPSE1, 100)
     ) %>%
     select(-Q1, -Q3, -IQR_val, -lower_bound, -upper_bound, -is_outlier) %>%
     ungroup()
   
   return(df)
 }
+
+df <- handle_ps_lapse1(df)
 

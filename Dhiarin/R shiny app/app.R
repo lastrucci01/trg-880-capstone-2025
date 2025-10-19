@@ -8,15 +8,31 @@ library(shinyjs)
 library(reticulate)
 options(scipen=999)
 
+
+# Initialize Python environment
+#use_virtualenv("~/.virtualenvs/r-reticulate", required = TRUE)
+virtualenv_create("r-reticulate")
+
+# Tell reticulate to use it
+use_virtualenv("r-reticulate", required = TRUE)
+joblib <- import("joblib")
+np <- import("numpy")
+
 df <- readRDS("clean_selected_collapsed_grouped_Ethan.rds")
 model_multi  <- readRDS("multinomial_model.rds")
 cv_fit <- model_multi$model
 xnames <- model_multi$xnames
 coef(cv_fit)
 
+FDA_MARS <- readRDS("final_FDA_MARS_model.rds")
+
 tf <- df %>% 
   mutate(TAR_STATUS = if_else(STATUS %in% c("CAN_LAP","SUR"), 1, 0))
 
+
+# Load HistGradientBoosting model
+histgrad_model <- joblib$load("histgradboost_model.pkl")
+label_encoder <- joblib$load("label_encoder.pkl")
 
 # ---- UI ----
 ui <- navbarPage(
@@ -245,6 +261,10 @@ server <- function(input, output, session) {
       )
     } else if (input$model_type == "Multinomial Logistic") {
       model_multi
+    }else if (input$model_type == "HistGradientBoosting") {
+      histgrad_model  # Return the loaded model
+    }else if(input$model_type == "FDA-MARS"){
+      FDA_MARS
     }
     
   })
@@ -273,7 +293,33 @@ server <- function(input, output, session) {
                               levels = levels(tf$PAYER_GENDER)),
         PS_LAPSE1 = input$ps_lapse1
       )
-    } else {
+    } else if(input$model_type == "HistGradientBoosting") {
+      new_data <- data.frame(
+        INCOME = input$INCOME,
+        PS_LAPSE1 = input$PS_LAPSE1,
+        SECTOR = factor(input$SECTOR, levels = levels(tf$SECTOR)),
+        PAYMENT_MODE = factor(input$PAYMENT_MODE,
+                              levels = levels(tf$PAYMENT_MODE)),
+        PAYER_GENDER = factor(input$PAYER_GENDER,
+                              levels = levels(tf$PAYER_GENDER)),
+        PRODUCT_GROUP = factor(input$PRODUCT_GROUP,
+                               levels = levels(tf$PRODUCT_GROUP)),
+        PAYER_AGE_GROUP = factor(input$PAYER_AGE_GROUP,
+                                 levels = levels(tf$PAYER_AGE_GROUP)),
+        PREMIUM = input$PREMIUM,
+        TERM = input$TERM,
+        PAYER_MARITAL_STATUS = factor(input$PAYER_MARITAL_STATUS,
+                                      levels = levels(tf$PAYER_MARITAL_STATUS)),
+        COMPANY_NAME = factor(input$COMPANY_NAME,
+                              levels = levels(tf$COMPANY_NAME)),
+        PAYPOINT_NAME = factor(input$PAYPOINT_NAME,
+                               levels = levels(tf$PAYPOINT_NAME))
+      )
+      # HistGradientBoosting prediction with 12 features
+      # Order: INCOME, PS_LAPSE1, SECTOR, PAYMENT_MODE, PAYER_GENDER, PRODUCT_GROUP,
+      #        PAYER_AGE_GROUP, PREMIUM, TERM, PAYER_MARITAL_STATUS, COMPANY_NAME, PAYPOINT_NAME
+     
+    } else if(input$model_type == "FDA MARS"){
       new_data <- data.frame(
         INCOME = input$INCOME,
         PS_LAPSE1 = input$PS_LAPSE1,
@@ -327,6 +373,45 @@ server <- function(input, output, session) {
       output_text <- paste0(
         "Predicted Policy Status Probabilities:\n",
         paste0(rownames(prob_df), ": ", prob_df[, 1], collapse = "\n")
+      )
+    } else if(input$model_type == "HistGradientBoosting"){
+      feature_vector <- c(
+        new_data$INCOME,
+        new_data$PS_LAPSE1,
+        1, # SECTOR placeholder
+        as.numeric(new_data$PAYMENT_MODE),
+        as.numeric(new_data$PAYER_GENDER),
+        as.numeric(new_data$PRODUCT_GROUP),
+        as.numeric(new_data$PAYER_AGE_GROUP),
+        new_data$PREMIUM,
+        new_data$TERM,
+        as.numeric(new_data$PAYER_MARITAL_STATUS),
+        1, # COMPANY_NAME placeholder
+        1  # PAYPOINT_NAME placeholder
+      )
+      
+      # Convert to matrix for prediction
+      X_single <- r_to_py(matrix(feature_vector, nrow = 1))
+      
+      # Make prediction
+      pred <- histgrad_model$predict(X_single)
+      prob <- histgrad_model$predict_proba(X_single)
+      
+      # Get results
+      pred_int <- as.integer(py_to_r(pred))
+      pred_label <- py_to_r(label_encoder$inverse_transform(r_to_py(array(pred_int))))
+      probabilities <- prob
+      classes <- py_to_r(label_encoder$classes_)
+      
+      output_text <- paste0(
+        "Predicted Policy Status Probabilities:\n",
+        paste0(classes, ": ", probabilities, collapse = "\n")
+      )
+    } else if(input$model_type == "FDA MARS"){
+      posterior_probs_new_observation <- predict(final_FDA_MARS_model, newdata = new_data , type = "posterior" )
+      output_text <- paste0(
+        "Predicted Policy Status Probabilities:\n",
+        paste0(classes, ": ", posterior_probs_new_observation, collapse = "\n")
       )
     }
     

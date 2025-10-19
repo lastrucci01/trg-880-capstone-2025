@@ -5,13 +5,14 @@ library(dplyr)
 library(VGAM)
 library(glmnet)
 library(shinyjs)
+library(reticulate)
 options(scipen=999)
 
 df <- readRDS("clean_selected_collapsed_grouped_Ethan.rds")
 model_multi  <- readRDS("multinomial_model.rds")
 cv_fit <- model_multi$model
 xnames <- model_multi$xnames
-
+coef(cv_fit)
 
 tf <- df %>% 
   mutate(TAR_STATUS = if_else(STATUS %in% c("CAN_LAP","SUR"), 1, 0))
@@ -67,16 +68,9 @@ ui <- navbarPage(
                    
                    # Model selection
                    selectInput("model_type", "Select Model Type:",
-                               choices = c("Binary Logistic", "Multinomial Logistic"),
-                               selected = "Binary Logistic"),
+                               choices = c("Multinomial Logistic", "HistGradientBoosting", "FDA-MARS"),
+                               selected = "Multinomial Logistic"),
                    
-                   # Dataset selection
-                   selectInput("data_scope", "Select Dataset to Model On:",
-                               choices = c("Full Dataset", "Grouped Dataset"),
-                               selected = "Full Dataset"),
-                   selectInput("group_var", "Select Grouping Variable:",
-                               choices = c("PRODUCT_GROUP", "PAYMENT_MODE")),
-                   uiOutput("group_value_ui"),
                    # Predict button
                    div(style = "margin-top: 10px;",
                        actionButton("predict_btn", "Predict Lapse Probability", class = "btn-primary"))
@@ -92,26 +86,36 @@ ui <- navbarPage(
                    fluidRow(
                      column(4,
                             numericInput("PREMIUM", "Premium:", value = 500, min = 0),
-                            numericInput("INCOME", "Income:", value = 10000, min = 0)
+                            numericInput("INCOME", "Income:", value = 10000, min = 0),
+                            selectInput("SECTOR", "Sector:",
+                                        choices = levels(tf$SECTOR)),
+                            selectInput("COMPANY_NAME", "Company Name:",
+                                        choices = levels(tf$COMPANY_NAME))
+                            
+                            
                      ),
                      column(4,
                             numericInput("TERM", "Policy Term (Years):", value = 10, min = 1),
                             numericInput("ps_lapse1", "Broker Lapse Performance (%):",
                                          value = 95, min = 0, max = 100),
-                            selectInput("PRODUCT_GROUP", "Product Code:",
-                                        choices = c("FUNERAL", "HEALTH", "INVEST", "RISK", "UNKNOWN")),
-                            selectInput("PAYMENT_MODE", "Payment Mode:",
-                                        choices = c("ADD", "RSO", "DSO"))
+                            
+                           
+                            selectInput("Gender", "Payer Gender:", choices = c("MALE", "FEMALE")),
+                            selectInput("PAYER_MARITAL_STATUS", "PAYER_MARITAL_STATUS:",
+                                        choices = c("S", "M", "W") )
+                          
                      ),
                      column(4,
+                            selectInput("PRODUCT_GROUP", "Product Code:",
+                                        choices = c("FUNERAL", "HEALTH", "INVEST", "RISK", "UNKNOWN")),
                             selectInput("AGE_AT_COMMENCEMENT", "Age at Commencement:",
                                         choices = c( "18-25", "26-35", "36-45", "46-55")),
-                            selectInput("Gender", "Payer Gender:", choices = c("MALE", "FEMALE")),
-                            selectInput("Insured_Gender", "Insured Gender:", choices = c("MALE", "FEMALE")),
-                            selectInput("PAYER_MARITAL_STATUS", "PAYER_MARITAL_STATUS:",
-                                        choices = c("S", "M", "W")),
-                            selectInput("INSURED_MARITAL_STATUS", "INSURED_MARITAL_STATUS:",
-                                        choices = c("S", "M", "W"))
+                            selectInput("PAYMENT_MODE", "Payment Mode:",
+                                        choices = c("ADD", "RSO", "DSO","ASO")),
+                            selectInput("PAYPOINT_NAME", "Paypoint:",
+                                        choices = levels(tf$PAYPOINT_NAME)),
+                            
+                            
                      )
                    ),
                    
@@ -194,37 +198,43 @@ ui <- navbarPage(
 # ---- SERVER ----
 server <- function(input, output, session) {
   
-  
-  output$group_value_ui <- renderUI({
-    req(input$group_var)
-    vals <- unique(tf[[input$group_var]])
-    selectInput("group_value", paste("Select", input$group_var, "value:"), choices = vals)
-  })
-  
-  
-  df_selected <- reactive({
-    if (input$data_scope == "Full Dataset") {
-      tf
-    } else {
-      req(input$group_var, input$group_value)
-      subset(tf, tf[[input$group_var]] == input$group_value)
-    }
-  })
-  
   observe({
-    if (input$data_scope == "Full Dataset") {
-      if (!is.null(input$group_var)) shinyjs::disable("group_var")
-      if (!is.null(input$group_value)) shinyjs::disable("group_value")
-    } else {
-      shinyjs::enable("group_var")
-      shinyjs::enable("group_value")
+    
+    
+    multinomial_inputs <- c("PAYER_AGE_GROUP", "PRODUCT_GROUP", "PREMIUM",
+                            "INCOME", "PAYMENT_MODE", "TERM",
+                            "PAYER_GENDER", "PS_LAPSE1")
+    
+    histgb_inputs <- c("INCOME", "PS_LAPSE1", "SECTOR", "PAYMENT_MODE",
+                       "PAYER_GENDER", "PRODUCT_GROUP", "PAYER_AGE_GROUP",
+                       "PREMIUM", "TERM", "PAYER_MARITAL_STATUS",
+                       "COMPANY_NAME", "PAYPOINT_NAME")
+    
+    fda_mars_inputs <- c("INCOME", "PREMIUM", "PS_LAPSE1", "SECTOR", "PAYMENT_MODE",
+                         "PAYER_GENDER", "PRODUCT_GROUP", "PAYER_AGE_GROUP",
+                         "TERM", "PAYER_MARITAL_STATUS", "COMPANY_NAME",
+                         "PAYPOINT_NAME")
+    
+    # Combine all unique IDs across models
+    all_inputs <- unique(c(multinomial_inputs, histgb_inputs, fda_mars_inputs))
+    
+    # Hide everything initially
+    lapply(all_inputs, shinyjs::hide)
+    
+    # Show only those relevant for the selected model
+    if (input$model_type == "Multinomial Logistic") {
+      lapply(multinomial_inputs, shinyjs::show)
+    } else if (input$model_type == "HistGradientBoosting") {
+      lapply(histgb_inputs, shinyjs::show)
+    } else if (input$model_type == "FDA-MARS") {
+      lapply(fda_mars_inputs, shinyjs::show)
     }
   })
   
   
 
   model_dynamic <- reactive({
-    data_used <- df_selected()  # full or grouped data
+    data_used <- tf  # full or grouped data
     
     if (input$model_type == "Binary Logistic") {
       glm(
@@ -247,24 +257,45 @@ server <- function(input, output, session) {
   # --- Prediction Tab Logic ---
   observeEvent(input$predict_btn, {
     req(model_dynamic())
-    
-    new_data <- data.frame(
-      PREMIUM = input$PREMIUM,
-      INCOME = input$INCOME,
-      TERM = input$TERM,
-      PAYER_AGE_GROUP = factor(input$AGE_AT_COMMENCEMENT , levels = c( 
-                                                                          "18-25",
-                                                                          "26-35",
-                                                                          "36-45",
-                                                                          "46-55")),
-      PAYER_MARITAL_STATUS = factor(input$PAYER_MARITAL_STATUS, levels = c("S", "M", "W")),
-      INSURED_MARITAL_STATUS = factor(input$INSURED_MARITAL_STATUS, levels = c("S", "M", "W")),
-      PAYMENT_MODE = factor(input$PAYMENT_MODE, levels = c("ADD", "RSO", "DSO")),
-      PS_LAPSE1 = input$ps_lapse1,
-      PAYER_GENDER = factor(input$Gender, levels = c("FEMALE", "MALE")),
-      INSURED_GENDER = factor(input$Insured_Gender, levels = c("FEMALE", "MALE")),
-      PRODUCT_GROUP = factor(input$PRODUCT_GROUP, levels = c("FUNERAL", "HEALTH", "INVEST", "RISK", "UNKNOWN"))
-    )
+    model_type <- input$model_type
+    if (model_type == "Multinomial Logistic") {
+      new_data <- data.frame(
+        PREMIUM = input$PREMIUM,
+        INCOME = input$INCOME,
+        TERM = input$TERM,
+        PAYER_AGE_GROUP = factor(input$AGE_AT_COMMENCEMENT,
+                                 levels = levels(tf$PAYER_AGE_GROUP)),
+        PAYMENT_MODE = factor(input$PAYMENT_MODE,
+                              levels = levels(tf$PAYMENT_MODE)),
+        PRODUCT_GROUP = factor(input$PRODUCT_GROUP,
+                               levels = levels(tf$PRODUCT_GROUP)),
+        PAYER_GENDER = factor(input$Gender,
+                              levels = levels(tf$PAYER_GENDER)),
+        PS_LAPSE1 = input$ps_lapse1
+      )
+    } else {
+      new_data <- data.frame(
+        INCOME = input$INCOME,
+        PS_LAPSE1 = input$PS_LAPSE1,
+        SECTOR = factor(input$SECTOR, levels = levels(tf$SECTOR)),
+        PAYMENT_MODE = factor(input$PAYMENT_MODE,
+                              levels = levels(tf$PAYMENT_MODE)),
+        PAYER_GENDER = factor(input$PAYER_GENDER,
+                              levels = levels(tf$PAYER_GENDER)),
+        PRODUCT_GROUP = factor(input$PRODUCT_GROUP,
+                               levels = levels(tf$PRODUCT_GROUP)),
+        PAYER_AGE_GROUP = factor(input$PAYER_AGE_GROUP,
+                                 levels = levels(tf$PAYER_AGE_GROUP)),
+        PREMIUM = input$PREMIUM,
+        TERM = input$TERM,
+        PAYER_MARITAL_STATUS = factor(input$PAYER_MARITAL_STATUS,
+                                      levels = levels(tf$PAYER_MARITAL_STATUS)),
+        COMPANY_NAME = factor(input$COMPANY_NAME,
+                              levels = levels(tf$COMPANY_NAME)),
+        PAYPOINT_NAME = factor(input$PAYPOINT_NAME,
+                               levels = levels(tf$PAYPOINT_NAME))
+      )
+    }
     
     
     if (input$model_type == "Binary Logistic") {
@@ -272,18 +303,11 @@ server <- function(input, output, session) {
       output_text <- paste0("Predicted Probability of Lapse: ", round(predicted_prob * 100, 2), "%")
       
     } else if (input$model_type == "Multinomial Logistic") {
-      x <- model.matrix(
-        STATUS ~ PAYER_AGE_GROUP + PRODUCT_GROUP + PREMIUM + INCOME +
-          PAYMENT_MODE + TERM + PAYER_GENDER + PAYER_MARITAL_STATUS +
-          INSURED_MARITAL_STATUS + INSURED_GENDER + PS_LAPSE1,
-        data = tf
-      )[, -1] 
       
       train_colnames <- xnames
       newx_raw <- as.matrix(model.matrix(
-        ~ PAYER_AGE_GROUP + PRODUCT_GROUP + PREMIUM + INCOME +
-          PAYMENT_MODE + TERM + PAYER_GENDER + PAYER_MARITAL_STATUS +
-          INSURED_MARITAL_STATUS + INSURED_GENDER + PS_LAPSE1,
+        ~  PAYER_AGE_GROUP + PRODUCT_GROUP + PREMIUM + INCOME +
+          PAYMENT_MODE + TERM + PAYER_GENDER  + PS_LAPSE1,
         data = new_data
       )[, -1, drop = FALSE])
       

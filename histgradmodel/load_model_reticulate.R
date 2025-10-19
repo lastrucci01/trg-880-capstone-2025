@@ -18,7 +18,7 @@ cat("Configuring Python environment...\n")
 # Try to use system Python or create a conda environment
 tryCatch({
   # Check if we can use system Python
-  use_python("/usr/bin/python3", required = FALSE)
+  use_virtualenv("~/.virtualenvs/r-reticulate", required = TRUE)
 }, error = function(e) {
   cat("System Python not found, trying other options...\n")
 })
@@ -67,6 +67,8 @@ import_with_retry <- function(module_name, max_attempts = 3) {
     })
   }
 }
+library(reticulate)
+
 
 # Import modules
 joblib <- import_with_retry("joblib")

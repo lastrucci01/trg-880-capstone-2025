@@ -296,15 +296,15 @@ server <- function(input, output, session) {
     } else if(input$model_type == "HistGradientBoosting") {
       new_data <- data.frame(
         INCOME = input$INCOME,
-        PS_LAPSE1 = input$PS_LAPSE1,
+        PS_LAPSE1 = input$ps_lapse1,
         SECTOR = factor(input$SECTOR, levels = levels(tf$SECTOR)),
         PAYMENT_MODE = factor(input$PAYMENT_MODE,
                               levels = levels(tf$PAYMENT_MODE)),
-        PAYER_GENDER = factor(input$PAYER_GENDER,
+        PAYER_GENDER = factor(input$Gender,
                               levels = levels(tf$PAYER_GENDER)),
         PRODUCT_GROUP = factor(input$PRODUCT_GROUP,
                                levels = levels(tf$PRODUCT_GROUP)),
-        PAYER_AGE_GROUP = factor(input$PAYER_AGE_GROUP,
+        PAYER_AGE_GROUP = factor(input$AGE_AT_COMMENCEMENT,
                                  levels = levels(tf$PAYER_AGE_GROUP)),
         PREMIUM = input$PREMIUM,
         TERM = input$TERM,
@@ -319,18 +319,18 @@ server <- function(input, output, session) {
       # Order: INCOME, PS_LAPSE1, SECTOR, PAYMENT_MODE, PAYER_GENDER, PRODUCT_GROUP,
       #        PAYER_AGE_GROUP, PREMIUM, TERM, PAYER_MARITAL_STATUS, COMPANY_NAME, PAYPOINT_NAME
      
-    } else if(input$model_type == "FDA MARS"){
+    } else if(input$model_type == "FDA-MARS"){
       new_data <- data.frame(
         INCOME = input$INCOME,
-        PS_LAPSE1 = input$PS_LAPSE1,
+        PS_LAPSE1 = input$ps_lapse1,
         SECTOR = factor(input$SECTOR, levels = levels(tf$SECTOR)),
         PAYMENT_MODE = factor(input$PAYMENT_MODE,
                               levels = levels(tf$PAYMENT_MODE)),
-        PAYER_GENDER = factor(input$PAYER_GENDER,
+        PAYER_GENDER = factor(input$Gender,
                               levels = levels(tf$PAYER_GENDER)),
         PRODUCT_GROUP = factor(input$PRODUCT_GROUP,
                                levels = levels(tf$PRODUCT_GROUP)),
-        PAYER_AGE_GROUP = factor(input$PAYER_AGE_GROUP,
+        PAYER_AGE_GROUP = factor(input$AGE_AT_COMMENCEMENT,
                                  levels = levels(tf$PAYER_AGE_GROUP)),
         PREMIUM = input$PREMIUM,
         TERM = input$TERM,
@@ -407,8 +407,8 @@ server <- function(input, output, session) {
         "Predicted Policy Status Probabilities:\n",
         paste0(classes, ": ", probabilities, collapse = "\n")
       )
-    } else if(input$model_type == "FDA MARS"){
-      posterior_probs_new_observation <- predict(final_FDA_MARS_model, newdata = new_data , type = "posterior" )
+    } else if(input$model_type == "FDA-MARS"){
+      posterior_probs_new_observation <- predict(FDA_MARS, newdata = new_data , type = "posterior" )
       output_text <- paste0(
         "Predicted Policy Status Probabilities:\n",
         paste0(classes, ": ", posterior_probs_new_observation, collapse = "\n")
